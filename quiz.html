@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>الاختبارات - خليل المسلم</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:'Cairo',sans-serif; background:#050505; color:#f3e9c6; padding-bottom:90px; }
+  header { text-align:center; padding:25px 10px 5px; }
+  header h1 { margin:0; font-size:30px; font-weight:900;
+    background:linear-gradient(90deg,var(--g4),var(--g2),var(--g),var(--g2),var(--g4));
+    background-size:300% auto; -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:shine 4s linear infinite; }
+  @keyframes shine { to { background-position:300% center; } }
+  .sub { text-align:center; color:var(--g3); font-size:14px; margin:0 16px 8px; }
+
+  .card { background:linear-gradient(145deg,#111,var(--c2)); margin:14px 16px; padding:18px; border-radius:20px;
+    border:1px solid var(--g); text-align:center; animation:glow 3s ease-in-out infinite; }
+  @keyframes glow { 0%,100% { box-shadow:0 0 8px rgba(var(--gr),.25); } 50% { box-shadow:0 0 22px rgba(var(--gr),.55); } }
+  .cat { display:block; width:100%; margin:8px 0; padding:15px; border:1px solid var(--b); border-radius:14px;
+    background:#0d0d0d; color:#fff6d6; font-size:18px; font-weight:700; font-family:'Cairo',sans-serif; }
+  .cat:active { border-color:var(--g2); box-shadow:0 0 14px rgba(var(--gr),.5); }
+  .cat.all { background:linear-gradient(90deg,var(--g4),var(--g)); color:#000; font-weight:900; }
+
+  #qbox, #end, #start { display:none; }
+  .meta { display:flex; justify-content:space-between; color:var(--g3); font-size:14px; margin-bottom:6px; }
+  .bar { height:10px; background:#0d0d0d; border:1px solid var(--b); border-radius:10px; overflow:hidden; margin-bottom:14px; }
+  .fill { height:100%; width:0; background:linear-gradient(90deg,var(--g4),var(--g2)); transition:.4s; }
+  #qtext { font-size:22px; line-height:2; color:#fff6d6; white-space:pre-line; margin-bottom:10px; }
+  .opt { display:block; width:100%; margin:9px 0; padding:14px; text-align:right; border:1px solid var(--b);
+    border-radius:14px; background:#0d0d0d; color:#fff6d6; font-size:17px; line-height:1.8; font-family:'Cairo',sans-serif; }
+  .opt.good { border-color:#4caf50; background:rgba(76,175,80,.18); color:#b8f5bb; }
+  .opt.bad { border-color:#ff6b6b; background:rgba(255,107,107,.15); color:#ffb3b3; }
+  .go { display:block; width:100%; margin-top:12px; padding:14px; border:none; border-radius:14px; font-size:17px;
+    font-weight:900; background:linear-gradient(90deg,var(--g4),var(--g)); color:#000; font-family:'Cairo',sans-serif; }
+  #score { font-size:48px; font-weight:900; color:var(--g2); }
+  #emsg { font-size:20px; color:#fff6d6; margin:8px 0 14px; }
+
+</style>
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+<meta name="theme-color" content="#050505">
+<link rel="apple-touch-icon" href="icon-180.png">
+</head>
+<body>
+  <header><h1>🧠 الاختبارات</h1></header>
+  <div class="sub">أسئلة تتغير كل مرة وتناسب مستواك</div>
+  <div class="sub" id="loading">جاري تجهيز الأسئلة...</div>
+
+  <div class="card" id="start">
+    <div style="color:#ffe27a;font-weight:900;margin-bottom:6px">اختر المجال (10 أسئلة)</div>
+    <button class="cat all" onclick="startQuiz('all')">🎯 كل المجالات</button>
+    <button class="cat" onclick="startQuiz('quran')">📖 القرآن</button>
+    <button class="cat" onclick="startQuiz('stories')">📜 القصص والعبر</button>
+    <button class="cat" onclick="startQuiz('adhkar')">🤲 الأذكار</button>
+    <button class="cat" onclick="startQuiz('misc')">🌙 معلومات إسلامية</button>
+  </div>
+
+  <div class="card" id="qbox">
+    <div class="meta"><span id="qnum"></span><span id="qcat"></span></div>
+    <div class="bar"><div class="fill" id="pfill"></div></div>
+    <div id="qtext"></div>
+    <div id="opts"></div>
+    <button class="go" id="nextBtn" style="display:none" onclick="nextQ()"></button>
+  </div>
+
+  <div class="card" id="end">
+    <div id="score"></div>
+    <div id="emsg"></div>
+    <button class="go" onclick="again()">🔄 اختبار جديد</button>
+  </div>
+
+  <script src="dates.js"></script>
+<script src="anbiya.js"></script>
+<script>
+  const $ = id => document.getElementById(id);
+  const Q = [];
+  let stat = {};
+  try { stat = JSON.parse(localStorage.getItem("quiz:stat") || "{}"); } catch (e) {}
+  const CATN = { quran: "القرآن", stories: "القصص", adhkar: "الأذكار", misc: "معلومات" };
+
+  function shuffle(a) {
+    a = a.slice();
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+  }
+  function pickN(arr, n, not) { return shuffle(arr.filter(x => !not.includes(x))).slice(0, n); }
+  function nums(c, min, max, k) {
+    const set = new Set();
+    let tries = 0;
+    while (set.size < k && tries < 300) {
+      tries++;
+      const d = 1 + Math.floor(Math.random() * 8);
+      const v = c + (Math.random() < 0.5 ? -d : d);
+      if (v >= min && v <= max && v !== c) set.add(v);
+    }
+    let f = 1;
+    while (set.size < k) { const v = c + 8 + f++; if (v !== c) set.add(v); }
+    return Array.from(set);
+  }
+  function add(cat, id, q, correct, wrongs) {
+    Q.push({ cat: cat, id: id, q: q, correct: String(correct), wrongs: wrongs.map(String) });
+  }
+
+  function build(qd, ad) {
+    // القرآن
+    const surahs = qd.data.surahs;
+    const names = surahs.map(s => s.name);
+    surahs.forEach(s => {
+      add("quran", "ac:" + s.number, "كم عدد آيات «" + s.name + "»؟", s.ayahs.length, nums(s.ayahs.length, 2, 300, 3));
+      add("quran", "sn:" + s.number, "ما رقم «" + s.name + "» في ترتيب المصحف؟", s.number, nums(s.number, 1, 114, 3));
+      add("quran", "nm:" + s.number, "ما اسم السورة رقم " + s.number + " في المصحف؟", s.name, pickN(names, 3, [s.name]));
+    });
+    const lg = surahs.reduce((a, b) => b.ayahs.length > a.ayahs.length ? b : a);
+    add("quran", "longest", "ما أطول سورة في القرآن الكريم؟", lg.name, pickN(names, 3, [lg.name]));
+    add("quran", "n114", "كم عدد سور القرآن الكريم؟", 114, [110, 100, 120]);
+
+    // القصص والعبر
+    const pn = ANBIYA.map(p => p.name);
+    const tc = {};
+    ANBIYA.forEach(p => { tc[p.title] = (tc[p.title] || 0) + 1; });
+    ANBIYA.forEach(p => {
+      if (tc[p.title] === 1) add("stories", "tt:" + p.name, "من هو النبي الموصوف بـ «" + p.title + "»؟", p.name, pickN(pn, 3, [p.name]));
+      add("stories", "ls:" + p.name, "ما العبرة الأبرز من قصة نبي الله " + p.name + "؟", p.lesson, pickN(ANBIYA.map(x => x.lesson), 3, [p.lesson]));
+    });
+    const safe = ["آدم", "نوح", "هود", "صالح", "إبراهيم", "لوط", "إسماعيل", "إسحاق", "يعقوب", "يوسف", "موسى", "هارون", "داود", "سليمان", "زكريا", "يحيى", "عيسى", "محمد"];
+    const ord = {};
+    ANBIYA.forEach(p => { ord[p.name] = p.order; });
+    const pairs = [];
+    for (let i = 0; i < safe.length; i++) for (let j = i + 1; j < safe.length; j++) {
+      if (ord[safe[i]] && ord[safe[j]] && ord[safe[j]] - ord[safe[i]] >= 2) pairs.push([safe[i], safe[j]]);
+    }
+    shuffle(pairs).slice(0, 25).forEach(p => {
+      add("stories", "or:" + p[0] + ":" + p[1], "أيّهما أسبق زمناً: النبي " + p[0] + " أم النبي " + p[1] + "؟", p[0], [p[1]]);
+    });
+    add("stories", "n25", "كم عدد الأنبياء المذكورين بالاسم في القرآن الكريم؟", 25, [20, 24, 30]);
+    add("stories", "last", "من هو خاتم الأنبياء والمرسلين؟", "محمد ﷺ", ["عيسى", "موسى", "إبراهيم"]);
+
+    // الأذكار
+    ad.forEach(c => c.array.forEach(it => {
+      const n = Number(it.count) || 1;
+      const t = (it.text || "").trim();
+      if (t.length < 25) return;
+      const w = t.split(" ").slice(0, 12).join(" ") + "…";
+      add("adhkar", "ad:" + c.id + ":" + it.id, "كم مرة يُقال هذا الذكر؟\n«" + w + "»", n, pickN([1, 3, 7, 10, 33, 100, 4, 2], 3, [n]));
+    }));
+
+    // معلومات إسلامية
+    for (let i = 0; i < 12; i++) {
+      add("misc", "hm:" + i, "ما اسم الشهر الهجري رقم " + (i + 1) + "؟", HM[i], pickN(HM, 3, [HM[i]]));
+      add("misc", "hn:" + i, "ما الشهر الهجري الذي يلي شهر " + HM[i] + "؟", HM[(i + 1) % 12], pickN(HM, 3, [HM[(i + 1) % 12], HM[i]]));
+    }
+    add("misc", "h12", "كم عدد أشهر السنة الهجرية؟", 12, [10, 11, 13]);
+    [["الفجر", 2], ["الظهر", 4], ["العصر", 4], ["المغرب", 3], ["العشاء", 4]].forEach(r => {
+      add("misc", "rk:" + r[0], "كم ركعة فرض صلاة " + r[0] + "؟", r[1], pickN([2, 3, 4, 5], 3, [r[1]]));
+    });
+    add("misc", "pil", "كم عدد أركان الإسلام؟", 5, [4, 6, 7]);
+    add("misc", "iman", "كم عدد أركان الإيمان؟", 6, [5, 4, 7]);
+    add("misc", "sal", "كم عدد الصلوات المفروضة في اليوم والليلة؟", 5, [3, 4, 6]);
+    add("misc", "ramq", "في أي شهر هجري أُنزل القرآن الكريم؟", "رمضان", ["شوال", "محرم", "رجب"]);
+  }
+
+  function weight(q) {
+    const s = stat[q.id];
+    if (!s) return 3;
+    if (s.w > s.c) return 4;
+    return 1 / (1 + s.c);
+  }
+  function choose(cat, n) {
+    let pool = (cat === "all" ? Q : Q.filter(x => x.cat === cat)).slice();
+    const out = [];
+    while (out.length < n && pool.length) {
+      const cats = Array.from(new Set(pool.map(x => x.cat)));
+      const c = cats[Math.floor(Math.random() * cats.length)];
+      const sub = pool.filter(x => x.cat === c);
+      const tot = sub.reduce((a, x) => a + weight(x), 0);
+      let r = Math.random() * tot, p = sub[sub.length - 1];
+      for (const x of sub) { r -= weight(x); if (r <= 0) { p = x; break; } }
+      out.push(p);
+      pool = pool.filter(x => x !== p);
+    }
+    return out;
+  }
+
+  let cur = [], idx = 0, score = 0, answered = false;
+
+  function startQuiz(cat) {
+    cur = choose(cat, 10); idx = 0; score = 0;
+    $("start").style.display = "none";
+    $("end").style.display = "none";
+    $("qbox").style.display = "block";
+    showQ();
+  }
+
+  function showQ() {
+    answered = false;
+    const q = cur[idx];
+    $("qnum").textContent = "سؤال " + (idx + 1) + " من " + cur.length;
+    $("qcat").textContent = CATN[q.cat];
+    $("pfill").style.width = (idx / cur.length * 100) + "%";
+    $("qtext").textContent = q.q;
+    const opts = shuffle(Array.from(new Set([q.correct].concat(q.wrongs))));
+    const box = $("opts");
+    box.innerHTML = "";
+    opts.forEach(o => {
+      const b = document.createElement("button");
+      b.className = "opt";
+      b.textContent = o;
+      b.onclick = () => answer(b, o, q);
+      box.appendChild(b);
+    });
+    $("nextBtn").style.display = "none";
+    window.scrollTo(0, 0);
+  }
+
+  function answer(btn, o, q) {
+    if (answered) return;
+    answered = true;
+    const s = stat[q.id] || { c: 0, w: 0 };
+    const ok = (o === q.correct);
+    if (ok) { score++; s.c++; if (navigator.vibrate) navigator.vibrate(20); }
+    else { s.w++; if (navigator.vibrate) navigator.vibrate([60, 40, 60]); }
+    stat[q.id] = s;
+    localStorage.setItem("quiz:stat", JSON.stringify(stat));
+    document.querySelectorAll(".opt").forEach(b => { b.disabled = true; if (b.textContent === q.correct) b.classList.add("good"); });
+    if (!ok) btn.classList.add("bad");
+    $("nextBtn").style.display = "block";
+    $("nextBtn").textContent = (idx === cur.length - 1) ? "عرض النتيجة 🏁" : "التالي ⬅";
+  }
+
+  function nextQ() {
+    idx++;
+    if (idx >= cur.length) finish(); else showQ();
+  }
+
+  function finish() {
+    $("qbox").style.display = "none";
+    $("end").style.display = "block";
+    $("score").textContent = score + " / " + cur.length;
+    const p = score / cur.length;
+    $("emsg").textContent = p >= 0.9 ? "ممتاز، ما شاء الله 🌟" : p >= 0.7 ? "جيد جداً 👏" : p >= 0.5 ? "جيد، واصل وستتحسن 💪" : "لا بأس، جرّب مرة ثانية 🌱";
+    const g = k => Number(localStorage.getItem(k) || 0);
+    localStorage.setItem("stat:quizCorrect", g("stat:quizCorrect") + score);
+    localStorage.setItem("stat:quizDone", g("stat:quizDone") + 1);
+    localStorage.setItem("stat:quizBest", Math.max(g("stat:quizBest"), score));
+  }
+
+  function again() {
+    $("end").style.display = "none";
+    $("start").style.display = "block";
+  }
+
+  Promise.all([fetch("quran.json").then(r => r.json()), fetch("adhkar.json").then(r => r.json())])
+    .then(res => {
+      build(res[0], res[1]);
+      $("loading").style.display = "none";
+      $("start").style.display = "block";
+    })
+    .catch(() => { $("loading").textContent = "تعذّر تحميل بيانات الاختبار"; });
+
+  if ("serviceWorker" in navigator) { navigator.serviceWorker.register("sw.js"); }
+</script>
+<script src="nav.js"></script>
+</body>
+</html>

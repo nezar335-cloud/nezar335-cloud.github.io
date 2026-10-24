@@ -1,0 +1,12 @@
+:root { --g:#d4af37; --g2:#ffe27a; --g3:#a99552; --g4:#8a6d1d; --b:#3a3010; --c2:#1a1608; --c3:#2a220a; --gr:212,175,55; }
+html { background:#050505; -webkit-text-size-adjust:100%; }
+body { max-width:640px; margin-left:auto !important; margin-right:auto !important;
+  padding-bottom:calc(86px + env(safe-area-inset-bottom, 0px)) !important; }
+header { padding-top:calc(54px + env(safe-area-inset-top, 0px)) !important; padding-bottom:6px !important; }
+#appnav { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:640px;
+  background:#000; display:flex; border-top:1px solid var(--g); z-index:50;
+  padding:8px 0 calc(8px + env(safe-area-inset-bottom, 0px)); }
+#appnav a { flex:1 1 0; min-width:0; color:var(--g3); text-decoration:none; text-align:center; font-size:11px; line-height:1.4; }
+#appnav a span { display:block; font-size:23px; transition:.2s; }
+#appnav a.active { color:var(--g2); font-weight:700; }
+#appnav a.active span { transform:scale(1.18); }

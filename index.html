@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>خليل المسلم</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:'Cairo',sans-serif; background:#050505; color:#f3e9c6; padding-bottom:90px; overflow-x:hidden; }
+
+  .star { position:fixed; bottom:-20px; color:var(--g); opacity:.5; animation:float linear infinite; pointer-events:none; }
+  @keyframes float { to { transform:translateY(-110vh); opacity:0; } }
+
+  header { text-align:center; padding:26px 10px 6px; }
+  header h1 { margin:0; font-size:36px; font-weight:900;
+    background:linear-gradient(90deg,var(--g4),var(--g2),var(--g),var(--g2),var(--g4));
+    background-size:300% auto; -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:shine 4s linear infinite; }
+  @keyframes shine { to { background-position:300% center; } }
+  #hello { color:var(--g); font-size:14px; }
+  #date { color:var(--g3); margin:4px 0 0; line-height:1.8; font-size:13px; }
+
+  .card { display:block; text-decoration:none; color:inherit; background:linear-gradient(145deg,#111,var(--c2));
+    margin:12px 16px; padding:16px; border-radius:20px; border:1px solid var(--g); text-align:center;
+    animation:glow 3s ease-in-out infinite, appear .8s ease both; }
+  @keyframes glow { 0%,100% { box-shadow:0 0 8px rgba(var(--gr),.25); } 50% { box-shadow:0 0 22px rgba(var(--gr),.55); } }
+  @keyframes appear { from { opacity:0; transform:translateY(25px); } to { opacity:1; transform:none; } }
+  .lbl { color:var(--g3); font-size:13px; }
+  .big { font-size:24px; font-weight:900; color:var(--g2); line-height:1.3; }
+  .small { font-size:12px; color:var(--g3); margin-top:2px; line-height:1.7; }
+
+  .hero { padding:20px 16px; background:radial-gradient(circle at 50% 0%,var(--c3),#111 70%); }
+  .hname { font-size:22px; color:#fff6d6; margin-top:4px; font-weight:700; }
+  .hcount { font-size:46px; font-weight:900; color:var(--g2); letter-spacing:2px; direction:ltr; line-height:1.2; }
+
+  .now { border-color:var(--g2); background:linear-gradient(145deg,var(--c2),var(--c3)); }
+  .nowt { font-size:20px; font-weight:900; color:var(--g2); margin:4px 0 2px; }
+
+  .qgrid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:12px 16px; }
+  .qgrid a { text-decoration:none; color:inherit; text-align:center; padding:12px 2px; border-radius:16px;
+    background:linear-gradient(145deg,#111,var(--c2)); border:1px solid var(--b); }
+  .qgrid a:active { border-color:var(--g2); transform:scale(.96); }
+  .qgrid .ic { font-size:26px; }
+  .qgrid .nm { font-size:11px; color:var(--g); margin-top:2px; }
+
+  .prow { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .pbox { text-decoration:none; color:inherit; background:#0d0d0d; border:1px solid var(--b); border-radius:16px; padding:10px 6px; }
+  .pic { font-size:24px; }
+  .bar { height:10px; background:#0d0d0d; border:1px solid var(--b); border-radius:10px; overflow:hidden; margin:12px 0 4px; }
+  .fill { height:100%; width:0; background:linear-gradient(90deg,var(--g4),var(--g2)); transition:.6s; }
+  .tdots { display:flex; justify-content:space-around; margin:14px 0 6px; }
+  .tdot { text-align:center; opacity:.55; }
+  .tdot .c { width:46px; height:46px; line-height:44px; margin:0 auto; font-size:22px; border-radius:50%; border:1px solid var(--b); background:#0d0d0d; }
+  .tdot .l { font-size:11px; color:var(--g3); margin-top:4px; }
+  .tdot.ok { opacity:1; }
+  .tdot.ok .c { border-color:var(--g); box-shadow:0 0 12px rgba(var(--gr),.5); }
+
+  .dtabs { display:flex; gap:6px; margin-bottom:12px; }
+  .dt { flex:1; padding:9px 4px; border:1px solid var(--b); border-radius:12px; background:#0d0d0d; color:var(--g3);
+    font-size:14px; font-family:'Cairo',sans-serif; }
+  .dt.on { border-color:var(--g2); background:linear-gradient(90deg,var(--g4),var(--g)); color:#000; font-weight:900; }
+  .dtext { white-space:pre-line; font-family:'Amiri',serif; font-size:22px; line-height:2.1; color:#fff6d6; min-height:60px; }
+  .ref { font-size:13px; color:var(--g3); margin-top:6px; }
+  .btn { display:inline-block; margin-top:10px; padding:9px 18px; border:1px solid var(--g); border-radius:12px;
+    color:var(--g2); text-decoration:none; font-size:14px; }
+
+  .row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 16px; }
+  .row2 .card { margin:0; padding:14px 8px; }
+
+
+  .tools-card { padding:16px 14px; }
+  .thead { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+  .thead .tt { font-size:18px; font-weight:900; color:var(--g2); }
+  .thead .tall { font-size:13px; color:var(--g3); text-decoration:none; }
+  .tgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .tl { display:block; text-decoration:none; color:inherit; text-align:center; padding:16px 4px;
+    border-radius:16px; background:#0d0d0d; border:1px solid var(--b); }
+  .tl:active { border-color:var(--g2); transform:scale(.96); }
+  .tl .ti { font-size:32px; }
+  .tl .tn { font-size:13px; color:var(--g); margin-top:6px; font-weight:700; }
+</style>
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+<meta name="theme-color" content="#050505">
+<link rel="apple-touch-icon" href="icon-180.png">
+</head>
+<body>
+  <header>
+    <h1>خليل المسلم</h1>
+    <div id="hello"></div>
+    <p id="date"></p>
+  </header>
+
+  <a href="prayer.html" class="card hero">
+    <div class="lbl">🕌 الصلاة القادمة</div>
+    <div class="hname" id="prName">...</div>
+    <div class="hcount" id="prCount">--:--:--</div>
+    <div class="small" id="prSub"></div>
+  </a>
+
+  <a href="adhkar.html" class="card now" id="nowCard">
+    <div class="lbl">⏰ الآن</div>
+    <div class="nowt" id="nowText"></div>
+    <div class="small" id="nowSub"></div>
+  </a>
+
+  <div class="card tools-card">
+    <div class="thead"><span class="tt">🧩 بقية الأدوات</span><a href="tools.html" class="tall">عرض الكل ←</a></div>
+    <div class="tgrid">
+      <a href="tasbih.html" class="tl"><div class="ti">📿</div><div class="tn">السبحة</div></a>
+      <a href="prayer.html" class="tl"><div class="ti">🕌</div><div class="tn">أوقات الصلاة</div></a>
+      <a href="anbiya.html" class="tl"><div class="ti">📜</div><div class="tn">القصص والعبر</div></a>
+      <a href="quiz.html" class="tl"><div class="ti">🧠</div><div class="tn">الاختبارات</div></a>
+      <a href="dates.html" class="tl"><div class="ti">📅</div><div class="tn">التواريخ</div></a>
+      <a href="achievements.html" class="tl"><div class="ti">👤</div><div class="tn">إنجازاتي</div></a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="prow">
+      <a href="achievements.html" class="pbox"><div class="pic">🔥</div><div class="big" id="stStreak">0</div><div class="small">أيام متتالية</div></a>
+      <a href="achievements.html" class="pbox"><div class="pic">⭐</div><div class="big" id="stLevel" style="font-size:18px">-</div><div class="small" id="stPts"></div></a>
+    </div>
+    <div class="bar"><div class="fill" id="lvFill"></div></div>
+    <div class="small" id="lvNext"></div>
+    <div class="tdots" id="tdots"></div>
+    <div class="small" id="taskCount"></div>
+  </div>
+
+  <a href="quran.html" class="card" id="dailyCard">
+    <div class="lbl" id="dLbl">✨ لك اليوم</div>
+    <div class="dtext" id="dText">...</div>
+    <div class="ref" id="dRef"></div>
+  </a>
+
+  <div class="row2" id="row2">
+    <a href="quran.html" class="card" id="lastCard" style="display:none">
+      <div class="lbl">📌 أكمل من حيث توقفت</div>
+      <div class="big" id="lastText" style="font-size:16px"></div>
+    </a>
+    <a href="dates.html" class="card" id="evCard">
+      <div class="lbl">📅 أقرب مناسبة</div>
+      <div class="big" id="evText" style="font-size:16px"></div>
+    </a>
+  </div>
+
+  <script src="dates.js"></script>
+<script src="adhan.js"></script>
+<script src="prayer.js"></script>
+<script>
+  const g = k => Number(localStorage.getItem(k) || 0);
+  const arr = k => { try { return JSON.parse(localStorage.getItem(k) || "[]"); } catch (e) { return []; } };
+  const $ = id => document.getElementById(id);
+  const now = new Date();
+  const dk = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
+  const hr = now.getHours();
+
+  // نجوم متحركة
+  for (let i = 0; i < 14; i++) {
+    const s = document.createElement("div");
+    s.className = "star";
+    s.textContent = "✦";
+    s.style.left = Math.random() * 100 + "vw";
+    s.style.fontSize = (8 + Math.random() * 14) + "px";
+    s.style.animationDuration = (8 + Math.random() * 12) + "s";
+    s.style.animationDelay = (Math.random() * 10) + "s";
+    document.body.appendChild(s);
+  }
+
+  // التحية والتاريخ
+  $("hello").textContent = "السلام عليكم · " + (hr < 12 ? "صباح الخير 🌤️" : hr < 17 ? "طاب يومك ☀️" : "مساء الخير 🌙");
+  const hj = hij(now);
+  $("date").innerHTML = gregText(now) + (hj ? "<br>" + hijText(hj) : "");
+
+  // الأيام المتتالية
+  // الأيام المتتالية: تُحسب من أيام النشاط الفعلي (أذكار أو تسبيح أو قرآن أو قصة)
+  function dayKeyOf(x) { return x.getFullYear() + "-" + (x.getMonth() + 1) + "-" + x.getDate(); }
+  function activeDay(k) {
+    return arr("adhkarDone:" + k).length > 0 || g("tasbihDay:" + k) > 0 ||
+           localStorage.getItem("quranDay:" + k) === "1" || localStorage.getItem("storyDay:" + k) === "1";
+  }
+  let streak = 0;
+  (function () {
+    const x = new Date();
+    if (!activeDay(dayKeyOf(x))) x.setDate(x.getDate() - 1);
+    while (activeDay(dayKeyOf(x)) && streak < 3650) { streak++; x.setDate(x.getDate() - 1); }
+  })();
+  if (streak > g("bestStreak")) localStorage.setItem("bestStreak", streak);
+  const best = g("bestStreak");
+
+  // النقاط والمستوى (نفس معادلة صفحة الإنجازات)
+  const points = best * 5 + g("stat:adhkarSets") * 10 + Math.floor(g("stat:tasbihTotal") / 10) +
+                 arr("stat:surahs").length * 3 + arr("stat:prophets").length * 5 + g("stat:quizCorrect") * 2;
+  const levels = [[0, "مبتدئ 🌱"], [100, "ثابت 🌿"], [300, "مجتهد 🌳"], [700, "مداوم ⭐"], [1500, "متميز 🌟"], [3000, "نجم الموقع 👑"]];
+  let li = 0;
+  levels.forEach((l, i) => { if (points >= l[0]) li = i; });
+  $("stStreak").textContent = streak;
+  $("stLevel").textContent = levels[li][1];
+  $("stPts").textContent = points + " نقطة";
+  if (li < levels.length - 1) {
+    const from = levels[li][0], to = levels[li + 1][0];
+    $("lvFill").style.width = ((points - from) / (to - from) * 100) + "%";
+    $("lvNext").textContent = "باقي " + (to - points) + " نقطة للمستوى: " + levels[li + 1][1];
+  } else {
+    $("lvFill").style.width = "100%";
+    $("lvNext").textContent = "وصلت لأعلى مستوى 👑";
+  }
+
+  // مهام اليوم
+  const adhDone = arr("adhkarDone:" + dk);
+  const done = {
+    adhkar: adhDone.length > 0,
+    tasbih: g("tasbihDay:" + dk) >= 33,
+    quran: localStorage.getItem("quranDay:" + dk) === "1",
+    story: localStorage.getItem("storyDay:" + dk) === "1"
+  };
+  const tasks = [["🤲", "أذكار", done.adhkar], ["📿", "تسبيح", done.tasbih], ["📖", "قرآن", done.quran], ["📜", "قصة", done.story]];
+  let ok = 0;
+  tasks.forEach(x => {
+    if (x[2]) ok++;
+    const d = document.createElement("div");
+    d.className = "tdot" + (x[2] ? " ok" : "");
+    d.innerHTML = '<div class="c"></div><div class="l"></div>';
+    d.querySelector(".c").textContent = x[2] ? "✅" : x[0];
+    d.querySelector(".l").textContent = x[1];
+    $("tdots").appendChild(d);
+  });
+  $("taskCount").textContent = "مهام اليوم: " + ok + " من " + tasks.length;
+
+  // بطاقة "الآن" الذكية
+  const lastSurah = localStorage.getItem("lastSurahName");
+  const lastAyah = localStorage.getItem("lastAyah") || 1;
+  const sug = [];
+  if (!adhDone.includes(1) && hr < 12) sug.push(["🌅 أذكار الصباح", "ابدأ يومك بذكر الله", "adhkar.html"]);
+  else if (!adhDone.includes(1) && hr >= 15) sug.push(["🌇 أذكار المساء", "اختم نهارك بذكر الله", "adhkar.html"]);
+  if (now.getDay() === 5) sug.push(["🕌 يوم الجمعة", "أكثر من الصلاة على النبي ﷺ، ويُستحب قراءة سورة الكهف", "quran.html"]);
+  if (!done.quran) sug.push(["📖 وردك من القرآن", lastSurah ? "أكمل: " + lastSurah + " · آية " + lastAyah : "ابدأ القراءة اليوم", "quran.html"]);
+  if (!done.tasbih) sug.push(["📿 سبّح 33 تسبيحة", "ذكر قليل يعمّر يومك", "tasbih.html"]);
+  if (!done.story) sug.push(["📜 قصة اليوم", "اقرأ قصة نبي واستخلص العبرة", "anbiya.html"]);
+  if (!sug.length) sug.push(["🎉 ما شاء الله!", "أنجزت مهام اليوم كاملة، تقبّل الله منك", "achievements.html"]);
+  $("nowText").textContent = sug[0][0];
+  $("nowSub").textContent = sug[0][1] + (sug[1] ? " · التالي: " + sug[1][0] : "");
+  $("nowCard").href = sug[0][2];
+
+  // اختيار يومي مختلف لكل شخص
+  function seed() {
+    let s = localStorage.getItem("seed");
+    if (!s) { s = String(Math.floor(Math.random() * 2147483647)); localStorage.setItem("seed", s); }
+    return s;
+  }
+  function hash(str) {
+    let h = 2166136261;
+    for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    return h;
+  }
+  function pick(n, salt) { return hash(seed() + "|" + dk + "|" + salt) % n; }
+
+  // محتوى اليوم: نوع عشوائي (آية أو ذكر أو حديث) يختلف من شخص لشخص ويتجدد كل يوم
+  function getJSON(u) { return fetch(u).then(r => { if (!r.ok) throw new Error(u); return r.json(); }); }
+  function splitSrc(text) {
+  const t = text || "";
+  let n = "";
+  const map = [];
+  for (let i = 0; i < t.length; i++) {
+    const c = t.charCodeAt(i);
+    if ((c >= 0x064B && c <= 0x065F) || c === 0x0670 || c === 0x0640 || (c >= 0x06D6 && c <= 0x06ED)) continue;
+    n += t[i];
+    map.push(i);
+  }
+  const re = /(^|[\s\[\(\]\)"”«»،.؛:!؟])(رواه|رواها|رواهما|رواهم|رواة|[أا]خرجه|[أا]خرجها|متفق عليه)(?![\u0621-\u064A])/g;
+  let m;
+  while ((m = re.exec(n)) !== null) {
+    const p = m.index + m[1].length;
+    if (p > 15 && p >= n.length * 0.15 && n.length - p <= 900) {
+      const cut = map[p];
+      return { main: t.slice(0, cut).replace(/[\s\[\(]+$/, ""), src: t.slice(cut).replace(/[\s\]\)]+$/, "") };
+    }
+  }
+  return { main: t, src: "" };
+}
+  const KINDS = {
+    a: { lbl: "✨ آية اليوم", href: "quran.html", get: () => getJSON("quran.json").then(d => {
+      const pool = [];
+      d.data.surahs.forEach(s => s.ayahs.forEach(a => {
+        let t = a.text;
+        if (a.numberInSurah === 1 && s.number !== 1 && s.number !== 9) t = t.split(" ").slice(4).join(" ");
+        const w = t.split(" ").length;
+        if (w >= 6 && w <= 40) pool.push([s, a, t]);
+      }));
+      const x = pool[pick(pool.length, "ayah")];
+      return { t: x[2] + " ﴿" + x[1].numberInSurah + "﴾", r: x[0].name + " · آية " + x[1].numberInSurah };
+    }) },
+    d: { lbl: "🤲 ذكر اليوم", href: "adhkar.html", get: () => getJSON("adhkar.json").then(d => {
+      const pool = [];
+      d.forEach(c => c.array.forEach(it => {
+        if (it.text && it.text.length >= 15 && it.text.length <= 400) pool.push([c.category, it]);
+      }));
+      const x = pool[pick(pool.length, "dhikr")];
+      const n = Number(x[1].count) || 1;
+      return { t: x[1].text, r: x[0] + (n > 1 ? " · يُكرَّر " + n + " مرات" : "") };
+    }) },
+    h: { lbl: "📚 حديث اليوم", href: "hadith.html", get: () => getJSON("hadith-daily.json").then(pool => {
+      const x = pool[pick(pool.length, "hadith")];
+      const sp = splitSrc(x.t);
+      const src = sp.src.length > 140 ? sp.src.slice(0, 140) + "…" : sp.src;
+      return { t: sp.main, r: x.s + (x.n ? " · حديث " + x.n : "") + (src ? " · " + src : "") };
+    }) }
+  };
+  async function loadDaily() {
+    const order = ["a", "d", "h"];
+    const f = pick(3, "kind");
+    const tryList = [order[f], order[(f + 1) % 3], order[(f + 2) % 3]];
+    for (const k of tryList) {
+      try {
+        const x = await KINDS[k].get();
+        $("dLbl").textContent = KINDS[k].lbl;
+        $("dText").textContent = x.t;
+        $("dText").style.fontSize = k === "a" ? "24px" : "21px";
+        $("dRef").textContent = x.r;
+        $("dailyCard").href = KINDS[k].href;
+        return;
+      } catch (e) {}
+    }
+    $("dText").textContent = "افتح القرآن الكريم 📖";
+  }
+  loadDaily();
+
+  // آخر قراءة + أقرب مناسبة
+  if (lastSurah) {
+    $("lastCard").style.display = "block";
+    $("lastText").textContent = lastSurah + " · آية " + lastAyah;
+  } else {
+    $("row2").style.gridTemplateColumns = "1fr";
+  }
+  (function () {
+    let b = null;
+    EVENTS.forEach(e => { const r = nextHijri(e.m, e.d); if (r && (!b || r.days < b.days)) b = { e: e, days: r.days }; });
+    $("evText").textContent = b ? b.e.ic + " " + b.e.n + ": " + daysText(b.days) : "";
+  })();
+
+  // الصلاة القادمة
+  function prTick() {
+    if (typeof adhan === "undefined") { $("prName").textContent = "افتح صفحة الصلاة"; return; }
+    const l = getLoc();
+    if (!l) {
+      $("prName").textContent = "اختر مدينتك";
+      $("prCount").textContent = "--:--:--";
+      $("prSub").textContent = "اضغط لعرض أوقات الصلاة";
+      return;
+    }
+    try {
+      const nx = nextPrayer(l);
+      $("prName").textContent = "صلاة " + nx.n + " · " + fmtTime(nx.t, l.tz);
+      $("prCount").textContent = fmtCountdown(nx.t - new Date());
+      $("prSub").textContent = l.name;
+    } catch (e) { $("prName").textContent = "افتح صفحة الصلاة"; }
+  }
+  prTick();
+  setInterval(prTick, 1000);
+
+  if ("serviceWorker" in navigator) { navigator.serviceWorker.register("sw.js"); }
+</script>
+<script src="nav.js"></script>
+<script src="install.js"></script>
+</body>
+</html>

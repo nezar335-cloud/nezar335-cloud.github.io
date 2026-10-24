@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>الأذكار - خليل المسلم</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:'Cairo',sans-serif; background:#050505; color:#f3e9c6; padding-bottom:90px; }
+  header { text-align:center; padding:25px 10px 5px; }
+  header h1 { margin:0; font-size:30px; font-weight:900;
+    background:linear-gradient(90deg,var(--g4),var(--g2),var(--g),var(--g2),var(--g4));
+    background-size:300% auto; -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:shine 4s linear infinite; }
+  @keyframes shine { to { background-position:300% center; } }
+
+  .item { display:flex; align-items:center; gap:12px; background:linear-gradient(145deg,#111,var(--c2));
+    margin:10px 16px; padding:14px; border-radius:16px; border:1px solid var(--b); cursor:pointer; }
+  .item:active { border-color:var(--g2); box-shadow:0 0 14px rgba(var(--gr),.5); }
+  .num { min-width:40px; height:40px; line-height:40px; text-align:center; border:1px solid var(--g);
+    border-radius:50%; color:var(--g2); font-weight:700; }
+  .name { font-size:18px; font-weight:700; color:#fff6d6; }
+  .info { font-size:13px; color:var(--g3); }
+
+  #reader { display:none; padding:0 16px; }
+  .back { margin:10px 0; padding:10px 18px; background:#111; color:var(--g2); border:1px solid var(--g);
+    border-radius:12px; font-size:15px; font-family:'Cairo',sans-serif; }
+  #title { text-align:center; color:var(--g2); font-size:24px; font-weight:900; margin:8px 0; }
+  .bar { height:10px; background:var(--c2); border:1px solid var(--b); border-radius:10px; overflow:hidden; margin:8px 0 4px; }
+  .fill { height:100%; width:0; background:linear-gradient(90deg,var(--g4),var(--g2)); transition:.4s; }
+  #ptext { text-align:center; color:var(--g3); font-size:13px; margin-bottom:10px; }
+
+  .zikr { background:#0d0d0d; border:1px solid var(--b); border-radius:18px; padding:16px; margin:12px 0; }
+  .zikr .t { font-family:'Amiri',serif; font-size:22px; line-height:2.2; color:#fff6d6; }
+  .zikr .btn { display:block; width:100%; margin-top:12px; padding:14px; border:none; border-radius:14px;
+    font-size:20px; font-weight:900; font-family:'Cairo',sans-serif;
+    background:linear-gradient(90deg,var(--g4),var(--g)); color:#000; }
+  .zikr.done { opacity:.45; border-color:var(--g); }
+  .zikr.done .btn { background:var(--c2); color:var(--g2); }
+  #finish { display:none; text-align:center; margin:20px 0; padding:18px; border:1px solid var(--g);
+    border-radius:18px; color:var(--g2); font-weight:900; font-size:20px; background:rgba(255,255,255,.04);
+    box-shadow:0 0 18px rgba(var(--gr),.5); }
+
+
+</style>
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+<meta name="theme-color" content="#050505">
+<link rel="apple-touch-icon" href="icon-180.png">
+</head>
+<body>
+  <header><h1>🤲 الأذكار</h1></header>
+
+  <div id="listPage"><div id="list">جاري التحميل...</div></div>
+
+  <div id="reader">
+    <div id="title"></div>
+    <div class="bar"><div class="fill" id="fill"></div></div>
+    <div id="ptext"></div>
+    <div id="cards"></div>
+    <div id="finish">✅ أتممت هذا القسم، تقبّل الله منك</div>
+  </div>
+
+  <script>
+  let data = [];
+  let cat = null;
+  let remain = [];
+  let initial = [];
+
+  function dayKey() {
+    const d = new Date();
+    return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+  }
+  function stateKey(id) { return "adhkar:" + dayKey() + ":" + id; }
+  function doneKey() { return "adhkarDone:" + dayKey(); }
+  function doneList() { return JSON.parse(localStorage.getItem(doneKey()) || "[]"); }
+
+  fetch("adhkar.json")
+    .then(r => r.json())
+    .then(d => { data = d; showList(); })
+    .catch(() => { document.getElementById("list").textContent = "ملف الأذكار غير موجود"; });
+
+  function showList() {
+    const box = document.getElementById("list");
+    box.innerHTML = "";
+    data.forEach((c, i) => {
+      let st = c.array.length + " ذكر";
+      if (doneList().includes(c.id)) {
+        st += " · ✅ تم اليوم";
+      } else {
+        const saved = localStorage.getItem(stateKey(c.id));
+        if (saved) {
+          const r = JSON.parse(saved);
+          const left = r.filter(x => x > 0).length;
+          st += " · متبقي " + left;
+        }
+      }
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = '<div class="num">' + (i + 1) + '</div><div><div class="name"></div><div class="info">' + st + '</div></div>';
+      div.querySelector(".name").textContent = c.category;
+      div.onclick = () => openCat(i);
+      box.appendChild(div);
+    });
+  }
+
+  function openCat(i) {
+    cat = data[i];
+    initial = cat.array.map(it => Number(it.count) || 1);
+    const saved = localStorage.getItem(stateKey(cat.id));
+    remain = saved ? JSON.parse(saved) : initial.slice();
+    if (remain.length !== initial.length) remain = initial.slice();
+    document.getElementById("listPage").style.display = "none";
+    document.getElementById("reader").style.display = "block";
+    document.getElementById("title").textContent = cat.category;
+    document.getElementById("finish").style.display = "none";
+
+    const cards = document.getElementById("cards");
+    cards.innerHTML = "";
+    cat.array.forEach((it, idx) => {
+      const z = document.createElement("div");
+      z.className = "zikr";
+      z.id = "z" + idx;
+      const t = document.createElement("div");
+      t.className = "t";
+      t.textContent = it.text;
+      const b = document.createElement("button");
+      b.className = "btn";
+      b.onclick = () => tap(idx);
+      z.appendChild(t);
+      z.appendChild(b);
+      cards.appendChild(z);
+      paint(idx);
+    });
+    progress();
+    window.scrollTo(0, 0);
+  }
+
+  function paint(idx) {
+    const z = document.getElementById("z" + idx);
+    const b = z.querySelector(".btn");
+    if (remain[idx] <= 0) {
+      z.classList.add("done");
+      b.textContent = "✓ تم";
+    } else {
+      z.classList.remove("done");
+      b.textContent = "التكرار المتبقي: " + remain[idx];
+    }
+  }
+
+  function tap(idx) {
+    if (remain[idx] <= 0) return;
+    remain[idx]--;
+    if (navigator.vibrate) navigator.vibrate(20);
+    localStorage.setItem(stateKey(cat.id), JSON.stringify(remain));
+    paint(idx);
+    progress();
+    if (remain[idx] === 0) {
+      const next = remain.findIndex(x => x > 0);
+      if (next >= 0) {
+        document.getElementById("z" + next).scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  }
+
+  function progress() {
+    const total = initial.reduce((a, b) => a + b, 0);
+    const left = remain.reduce((a, b) => a + b, 0);
+    const doneCount = total - left;
+    document.getElementById("fill").style.width = (doneCount / total * 100) + "%";
+    document.getElementById("ptext").textContent = doneCount + " من " + total;
+    if (left === 0) {
+      document.getElementById("finish").style.display = "block";
+      const list = doneList();
+      if (!list.includes(cat.id)) {
+        list.push(cat.id);
+        localStorage.setItem(doneKey(), JSON.stringify(list));
+        const n = Number(localStorage.getItem("stat:adhkarSets") || 0) + 1;
+        localStorage.setItem("stat:adhkarSets", n);
+      }
+    }
+  }
+
+  function goBack() {
+    document.getElementById("reader").style.display = "none";
+    document.getElementById("listPage").style.display = "block";
+    showList();
+  }
+
+  if ("serviceWorker" in navigator) { navigator.serviceWorker.register("sw.js"); }
+</script>
+<script src="nav.js"></script>
+</body>
+</html>

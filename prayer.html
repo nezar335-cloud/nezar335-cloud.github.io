@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>أوقات الصلاة - خليل المسلم</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#050505">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:'Cairo',sans-serif; background:#050505; color:#f3e9c6; }
+  header { text-align:center; }
+  header h1 { margin:0; font-size:28px; font-weight:900;
+    background:linear-gradient(90deg,var(--g4),var(--g2),var(--g),var(--g2),var(--g4));
+    background-size:300% auto; -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:shine 4s linear infinite; }
+  @keyframes shine { to { background-position:300% center; } }
+
+  .card { background:linear-gradient(145deg,#111,var(--c2)); margin:14px 16px; padding:16px; border-radius:20px;
+    border:1px solid var(--g); text-align:center; }
+  .card h3 { margin:0 0 10px; color:var(--g2); }
+  select { width:100%; padding:11px; margin:5px 0; background:#0d0d0d; color:#fff6d6; border:1px solid var(--g);
+    border-radius:12px; font-size:16px; font-family:'Cairo',sans-serif; }
+  .gps { width:100%; margin:8px 0; padding:13px; border:none; border-radius:14px; font-size:16px; font-weight:900;
+    background:linear-gradient(90deg,var(--g4),var(--g)); color:#000; font-family:'Cairo',sans-serif; }
+  #locName { color:var(--g3); font-size:14px; margin-top:6px; }
+  details { margin-top:8px; text-align:right; color:var(--g3); }
+  summary { cursor:pointer; padding:6px 0; }
+
+  #nextName { font-size:20px; color:var(--g3); }
+  #countdown { font-size:44px; font-weight:900; color:var(--g2); letter-spacing:2px; direction:ltr; }
+  #dateLine { font-size:13px; color:var(--g3); margin-top:4px; line-height:1.8; }
+
+  .pt { display:flex; align-items:center; gap:12px; margin:8px 16px; padding:13px 14px; border-radius:16px;
+    background:linear-gradient(145deg,#111,var(--c2)); border:1px solid var(--b); }
+  .pt.next { border-color:var(--g2); box-shadow:0 0 16px rgba(var(--gr),.5); }
+  .pt .ic { font-size:24px; }
+  .pt .nm { flex:1; font-size:19px; font-weight:700; color:#fff6d6; text-align:right; }
+  .pt .tm { font-size:19px; color:var(--g2); font-weight:700; }
+
+  .note { margin:14px 16px; padding:14px; font-size:13px; color:var(--g3); line-height:2; border:1px dashed var(--b); border-radius:14px; }
+  .warn { margin:12px 16px; padding:12px; border:1px solid #ff6b6b; border-radius:14px; color:#ff9b9b; text-align:center; }
+</style>
+</head>
+<body>
+  <header><h1>🕌 أوقات الصلاة</h1></header>
+  <div class="card">
+    <h3>📍 المكان</h3>
+    <select id="country"></select>
+    <select id="city"></select>
+    <button class="gps" onclick="useGps()">📡 استخدم موقعي الحالي</button>
+    <div id="locName">لم تختر مدينة بعد</div>
+    <details>
+      <summary>⚙️ إعدادات الحساب</summary>
+      <select id="method"></select>
+      <select id="madhab">
+        <option value="Shafi">العصر: ظل المثل (الجمهور)</option>
+        <option value="Hanafi">العصر: ظل المثلين (الحنفي)</option>
+      </select>
+    </details>
+  </div>
+
+  <div id="secT">
+    <div class="card">
+      <div id="nextName">اختر مدينتك لعرض الأوقات</div>
+      <div id="countdown">--:--:--</div>
+      <div id="dateLine"></div>
+    </div>
+    <div id="list"></div>
+    <div class="note">⚠️ الأوقات محسوبة فلكياً، وكل جهة تعتمد زوايا مختلفة للفجر والعشاء. إن اختلفت عن تقويمك، جرّب طريقة حساب أخرى من «إعدادات الحساب».</div>
+  </div>
+
+  <script src="dates.js"></script>
+<script src="adhan.js"></script>
+<script src="cities.js"></script>
+<script src="prayer.js"></script>
+<script>
+  const $ = id => document.getElementById(id);
+  const RAD = Math.PI / 180;
+
+  if (typeof adhan === "undefined") {
+    document.body.insertAdjacentHTML("afterbegin", '<div class="warn">ملف adhan.js غير موجود، حدّث الصفحة أو أعد التحميل.</div>');
+  }
+
+  const METHODS = [
+    ["UmmAlQura", "أم القرى (السعودية واليمن والخليج)"],
+    ["Egyptian", "الهيئة المصرية العامة للمساحة"],
+    ["MuslimWorldLeague", "رابطة العالم الإسلامي"],
+    ["Karachi", "جامعة العلوم الإسلامية - كراتشي"],
+    ["Dubai", "دبي"], ["Qatar", "قطر"], ["Kuwait", "الكويت"],
+    ["Turkey", "تركيا"], ["Tehran", "طهران"], ["Singapore", "سنغافورة"],
+    ["NorthAmerica", "أمريكا الشمالية"]
+  ];
+  const ICONS = { fajr: "🌅", sunrise: "🌄", dhuhr: "☀️", asr: "🌤️", maghrib: "🌇", isha: "🌙" };
+
+  let loc = getLoc();
+  let nx = null;
+  const selC = $("country"), selT = $("city"), selM = $("method"), selH = $("madhab");
+
+  selC.innerHTML = '<option value="">اختر الدولة</option>' + PLACES.map((p, i) => '<option value="' + i + '">' + p.c + '</option>').join("");
+  selM.innerHTML = METHODS.map(m => '<option value="' + m[0] + '">' + m[1] + '</option>').join("");
+
+  function dkm(a1, o1, a2, o2) {
+    const R = 6371, dLat = (a2 - a1) * RAD, dLng = (o2 - o1) * RAD;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(a1 * RAD) * Math.cos(a2 * RAD) * Math.sin(dLng / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(a));
+  }
+  function nearestPlace(lat, lng) {
+    let best = null;
+    PLACES.forEach(p => p.cities.forEach(c => {
+      const d = dkm(lat, lng, c[1], c[2]);
+      if (!best || d < best.d) best = { d: d, p: p };
+    }));
+    return best;
+  }
+
+  // ===== المكان =====
+  function fillCities(ci, ti) {
+    selT.innerHTML = '<option value="">اختر المدينة</option>';
+    if (ci === "" || ci === null || ci === undefined) return;
+    selT.innerHTML += PLACES[ci].cities.map((c, i) => '<option value="' + i + '">' + c[0] + '</option>').join("");
+    if (ti !== undefined && ti !== null) selT.value = String(ti);
+  }
+  selC.onchange = () => fillCities(selC.value);
+  selT.onchange = () => {
+    if (selC.value === "" || selT.value === "") return;
+    const p = PLACES[selC.value], c = p.cities[selT.value];
+    const old = loc || {};
+    loc = {
+      name: c[0] + "، " + p.c, lat: c[1], lng: c[2], tz: c[3],
+      method: p.m, madhab: old.madhab || "Shafi",
+      ci: Number(selC.value), ti: Number(selT.value)
+    };
+    setLoc(loc); syncSettings(); nx = null; refresh();
+  };
+  selM.onchange = () => { if (!loc) return; loc.method = selM.value; setLoc(loc); nx = null; refresh(); };
+  selH.onchange = () => { if (!loc) return; loc.madhab = selH.value; setLoc(loc); nx = null; refresh(); };
+
+  function syncSettings() {
+    if (!loc) return;
+    selM.value = loc.method || "MuslimWorldLeague";
+    selH.value = loc.madhab || "Shafi";
+  }
+
+  function useGps() {
+    if (!navigator.geolocation) { alert("المتصفح لا يدعم تحديد الموقع"); return; }
+    $("locName").textContent = "جاري تحديد موقعك...";
+    navigator.geolocation.getCurrentPosition(pos => {
+      const lat = pos.coords.latitude, lng = pos.coords.longitude;
+      const np = nearestPlace(lat, lng), old = loc || {};
+      loc = {
+        name: "موقعي الحالي (" + lat.toFixed(2) + "، " + lng.toFixed(2) + ")",
+        lat: lat, lng: lng, tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        method: (np && np.d < 600) ? np.p.m : "MuslimWorldLeague",
+        madhab: old.madhab || "Shafi"
+      };
+      setLoc(loc);
+      selC.value = ""; fillCities("");
+      syncSettings(); nx = null; refresh();
+    }, () => { alert("تعذّر تحديد الموقع، اختر مدينتك يدوياً"); refresh(); },
+    { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
+  }
+
+  // ===== الأوقات =====
+  function renderList() {
+    const box = $("list");
+    box.innerHTML = "";
+    if (!loc || typeof adhan === "undefined") return;
+    timesFor(loc, 0).forEach(x => {
+      const div = document.createElement("div");
+      div.className = "pt" + ((nx && nx.k === x.k && nx.t.getTime() === x.t.getTime()) ? " next" : "");
+      div.innerHTML = '<span class="ic"></span><span class="nm"></span><span class="tm"></span>';
+      div.querySelector(".ic").textContent = ICONS[x.k];
+      div.querySelector(".nm").textContent = x.n;
+      div.querySelector(".tm").textContent = fmtTime(x.t, loc.tz);
+      box.appendChild(div);
+    });
+  }
+
+  function tick() {
+    if (!loc || typeof adhan === "undefined") return;
+    try {
+      if (!nx || nx.t <= new Date()) { nx = nextPrayer(loc); renderList(); }
+      $("nextName").textContent = "صلاة " + nx.n + " · " + fmtTime(nx.t, loc.tz);
+      $("countdown").textContent = fmtCountdown(nx.t - new Date());
+    } catch (e) {}
+  }
+  setInterval(tick, 1000);
+
+  function refresh() {
+    $("locName").textContent = loc ? "📍 " + loc.name : "لم تختر مدينة بعد";
+    if (loc && typeof adhan !== "undefined") {
+      try {
+        nx = nextPrayer(loc);
+        renderList();
+        const now = new Date(), h = hij(now);
+        $("dateLine").innerHTML = gregText(now) + (h ? "<br>" + hijText(h) : "");
+        tick();
+      } catch (e) { $("nextName").textContent = "تعذّر حساب الأوقات"; }
+    }
+  }
+
+  // ===== البداية =====
+  if (loc && loc.ci !== undefined) { selC.value = String(loc.ci); fillCities(loc.ci, loc.ti); }
+  else fillCities("");
+  syncSettings();
+  refresh();
+
+  if ("serviceWorker" in navigator) { navigator.serviceWorker.register("sw.js"); }
+</script>
+<script src="nav.js"></script>
+</body>
+</html>

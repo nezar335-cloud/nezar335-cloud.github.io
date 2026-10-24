@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>المصادر والخصوصية - خليل المسلم</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#050505">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:'Cairo',sans-serif; background:#050505; color:#f3e9c6; }
+  header { text-align:center; }
+  header h1 { margin:0; font-size:28px; font-weight:900;
+    background:linear-gradient(90deg,var(--g4),var(--g2),var(--g),var(--g2),var(--g4));
+    background-size:300% auto; -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:shine 4s linear infinite; }
+  @keyframes shine { to { background-position:300% center; } }
+  .card { background:linear-gradient(145deg,#111,var(--c2)); margin:14px 16px; padding:16px 18px; border-radius:20px;
+    border:1px solid var(--g); }
+  .card h3 { margin:0 0 10px; color:var(--g2); text-align:center; }
+  .card p, .card li { font-size:15px; line-height:2.1; color:#e9dfba; margin:4px 0; }
+  .card ul { padding-right:20px; margin:6px 0; }
+  .card li b { color:var(--g2); }
+  .ver { text-align:center; color:var(--g3); font-size:13px; margin:12px 0 4px; }
+
+  .cbtn { display:block; margin:12px 0 4px; padding:13px; text-align:center; text-decoration:none; border-radius:14px;
+    font-weight:900; font-size:16px; background:linear-gradient(90deg,var(--g4),var(--g)); color:#000; }
+  .mail { text-align:center; direction:ltr; color:var(--g3); font-size:13px; word-break:break-all; }
+</style>
+</head>
+<body>
+  <header><h1>ℹ️ المصادر والخصوصية</h1></header>
+
+  <div class="card">
+    <h3>📱 عن التطبيق</h3>
+    <p><b>خليل المسلم</b> رفيقك اليومي: القرآن الكريم، الأحاديث، الأذكار، قصص الأنبياء، السبحة، أوقات الصلاة، والتواريخ الهجرية. ويعمل بدون إنترنت بعد أول تحميل.</p>
+  </div>
+
+  <div class="card">
+    <h3>🔒 الخصوصية</h3>
+    <ul>
+      <li>لا توجد حسابات ولا تسجيل دخول.</li>
+      <li>لا نجمع ولا نرسل أي بيانات شخصية. تقدّمك وإعداداتك محفوظة <b>على جهازك فقط</b>.</li>
+      <li>الموقع الجغرافي (إن سمحت به) يُستخدم داخل جهازك فقط لحساب أوقات الصلاة، ولا يُرسل لأي جهة.</li>
+      <li>لا إعلانات ولا أدوات تتبع.</li>
+      <li>عند مراسلتنا عبر البريد أو تيليجرام، تصلنا رسالتك وبيانات حسابك التي تختار إرسالها فقط، ولا نشاركها مع أي جهة.</li>
+      <li>الخطوط تُحمَّل من خدمة Google Fonts عند أول فتح (وقد يصل عنوان الاتصال إلى Google)، ثم تُحفظ للعمل بدون إنترنت.</li>
+      <li>لحذف بياناتك: استخدم زر «تصفير كل تقدّمي» في صفحة إنجازاتي، أو امسح بيانات التطبيق من إعدادات جهازك.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>📚 المصادر والشكر</h3>
+    <ul>
+      <li><b>القرآن الكريم</b> (برواية حفص، بالرسم العثماني): خدمة AlQuran Cloud.</li>
+      <li><b>الأحاديث</b> (الأربعون النووية، الأحاديث القدسية، صحيح البخاري، صحيح مسلم): مشروع Hadith API.</li>
+      <li><b>الأذكار</b>: مشروع Adhkar-json المستند إلى «حصن المسلم».</li>
+      <li><b>أوقات الصلاة</b>: مكتبة adhan-js مفتوحة المصدر.</li>
+      <li><b>الخطوط</b>: Cairo وAmiri من Google Fonts.</li>
+      <li><b>قصص الأنبياء</b>: ملخصات مبسّطة مبنية على ما ورد في القرآن الكريم.</li>
+    </ul>
+    <p>جزى الله خيراً كل من ساهم في هذه المشاريع المفتوحة.</p>
+  </div>
+
+  <div class="card">
+    <h3>📩 تواصل وإبلاغ عن خطأ</h3>
+    <p>إذا وجدت خطأً في نص (آية، حديث، ذكر، قصة) أو مشكلة في التطبيق، أو عندك اقتراح، راسلنا وسنصحّحه بإذن الله. اكتب القسم ورقم الحديث أو الآية، والصواب مع مصدره إن أمكن.</p>
+    <a class="cbtn" href="mailto:khalil.al.muslim3@gmail.com?subject=%D9%85%D9%84%D8%A7%D8%AD%D8%B8%D8%A9%20%D8%B9%D9%84%D9%89%20%D8%AA%D8%B7%D8%A8%D9%8A%D9%82%20%D8%AE%D9%84%D9%8A%D9%84%20%D8%A7%D9%84%D9%85%D8%B3%D9%84%D9%85&body=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%0A%0A%D8%A7%D9%84%D9%82%D8%B3%D9%85%20%28%D9%82%D8%B1%D8%A2%D9%86%20%2F%20%D8%AD%D8%AF%D9%8A%D8%AB%20%2F%20%D8%B0%D9%83%D8%B1%20%2F%20%D9%82%D8%B5%D8%B5%20%2F%20%D8%BA%D9%8A%D8%B1%20%D8%B0%D9%84%D9%83%29%3A%0A%D8%A7%D9%84%D8%B5%D9%81%D8%AD%D8%A9%20%D8%A3%D9%88%20%D8%B1%D9%82%D9%85%20%D8%A7%D9%84%D8%AD%D8%AF%D9%8A%D8%AB%20%D8%A3%D9%88%20%D8%A7%D9%84%D8%A2%D9%8A%D8%A9%3A%0A%D8%A7%D9%84%D8%AE%D8%B7%D8%A3%20%D8%A3%D9%88%20%D8%A7%D9%84%D9%85%D8%B4%D9%83%D9%84%D8%A9%3A%0A%D8%A7%D9%84%D8%B5%D9%88%D8%A7%D8%A8%20%28%D8%A5%D9%86%20%D9%88%D8%AC%D8%AF%D8%8C%20%D9%85%D8%B9%20%D8%B0%D9%83%D8%B1%20%D8%A7%D9%84%D9%85%D8%B5%D8%AF%D8%B1%29%3A%0A">📧 راسلنا بالبريد</a>
+    <a class="cbtn" href="https://t.me/N3_UNK" target="_blank" rel="noopener">✈️ راسلنا على تيليجرام</a>
+  </div>
+
+  <div class="card">
+    <h3>⚠️ تنبيه</h3>
+    <ul>
+      <li>النصوص نُقلت من مصادر مفتوحة، ولا يغني التطبيق عن الرجوع إلى المصحف المطبوع وكتب الحديث الأصلية. نرجو من أهل العلم تنبيهنا إلى أي خطأ يُلاحظ.</li>
+      <li>أوقات الصلاة محسوبة فلكياً، وقد تختلف دقائق عن التقويم المعتمد في بلدك.</li>
+    </ul>
+  </div>
+
+  <div class="ver">الإصدار 1.0</div>
+
+<script>
+  if ("serviceWorker" in navigator) { navigator.serviceWorker.register("sw.js"); }
+</script>
+<script src="nav.js"></script>
+</body>
+</html>

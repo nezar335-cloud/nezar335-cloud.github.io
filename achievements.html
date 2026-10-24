@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>إنجازاتي - خليل المسلم</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:'Cairo',sans-serif; background:#050505; color:#f3e9c6; padding-bottom:90px; }
+  header { text-align:center; padding:25px 10px 5px; }
+  header h1 { margin:0; font-size:30px; font-weight:900;
+    background:linear-gradient(90deg,var(--g4),var(--g2),var(--g),var(--g2),var(--g4));
+    background-size:300% auto; -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:shine 4s linear infinite; }
+  @keyframes shine { to { background-position:300% center; } }
+
+  .card { background:linear-gradient(145deg,#111,var(--c2)); margin:14px 16px; padding:18px; border-radius:20px;
+    border:1px solid var(--g); text-align:center; animation:glow 3s ease-in-out infinite; }
+  @keyframes glow { 0%,100% { box-shadow:0 0 8px rgba(var(--gr),.25); } 50% { box-shadow:0 0 22px rgba(var(--gr),.55); } }
+  .card h3 { margin:0 0 10px; color:var(--g2); }
+  #lvName { font-size:28px; font-weight:900; color:var(--g2); }
+  #pts { color:var(--g3); margin:4px 0 10px; }
+  .bar { height:12px; background:#0d0d0d; border:1px solid var(--b); border-radius:10px; overflow:hidden; }
+  .fill { height:100%; width:0; background:linear-gradient(90deg,var(--g4),var(--g2)); transition:.6s; }
+  #next { font-size:13px; color:var(--g3); margin-top:6px; }
+
+  .task { display:flex; align-items:center; gap:10px; padding:10px 12px; margin:8px 0; background:#0d0d0d;
+    border:1px solid var(--b); border-radius:14px; text-align:right; }
+  .task.ok { border-color:var(--g); color:var(--g2); }
+  .task .ic { font-size:22px; }
+
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:0 16px; }
+  .stat { background:linear-gradient(145deg,#111,var(--c2)); border:1px solid var(--b); border-radius:16px; padding:14px 8px; text-align:center; }
+  .stat .ic { font-size:24px; }
+  .stat b { display:block; font-size:24px; color:var(--g2); margin:4px 0; }
+  .stat span { font-size:12px; color:var(--g3); }
+
+  .badges { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .badge { background:#0d0d0d; border:1px solid var(--b); border-radius:16px; padding:12px 8px; opacity:.4; filter:grayscale(1); }
+  .badge.on { opacity:1; filter:none; border-color:var(--g); box-shadow:0 0 12px rgba(var(--gr),.35); }
+  .badge .ic { font-size:30px; }
+  .badge b { display:block; color:var(--g2); font-size:15px; margin:4px 0 2px; }
+  .badge span { font-size:12px; color:var(--g3); }
+
+  a.last { display:block; color:#000; text-decoration:none; font-weight:900; background:linear-gradient(90deg,var(--g4),var(--g));
+    border-radius:16px; padding:14px; margin:14px 16px; text-align:center; }
+
+
+</style>
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+<meta name="theme-color" content="#050505">
+<link rel="apple-touch-icon" href="icon-180.png">
+</head>
+<body>
+  <header><h1>👤 إنجازاتي</h1></header>
+
+  <div class="card">
+    <div id="lvName"></div>
+    <div id="pts"></div>
+    <div class="bar"><div class="fill" id="fill"></div></div>
+    <div id="next"></div>
+  </div>
+
+  <div class="card">
+    <h3>✅ مهام اليوم <span id="taskCount"></span></h3>
+    <div id="tasks"></div>
+  </div>
+
+  <div id="lastBox"></div>
+
+  <div class="grid" id="stats"></div>
+
+  <div class="card">
+    <h3>🏅 الأوسمة <span id="badgeCount"></span></h3>
+    <div class="badges" id="badges"></div>
+  </div>
+
+  <div class="card" style="border-color:#e04b4b">
+    <h3 style="color:#ff9d9d">🗑️ تصفير التقدّم</h3>
+    <div style="color:var(--g3);font-size:13px;line-height:1.9;margin-bottom:10px">يحذف الأيام المتتالية والنقاط والأوسمة والتسبيح وآخر قراءة والمحفوظات والاختبارات. (يبقى اللون والمدينة)</div>
+    <button id="resetBtn" style="padding:12px 22px;border:none;border-radius:12px;background:#e04b4b;color:#fff;font-weight:900;font-size:15px;font-family:'Cairo',sans-serif">🗑️ تصفير كل تقدّمي</button>
+  </div>
+
+  <script>
+  const g = k => Number(localStorage.getItem(k) || 0);
+  const arr = k => JSON.parse(localStorage.getItem(k) || "[]");
+  const d = new Date();
+  const dk = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+
+  // الأيام المتتالية (تنكسر إذا فاتك أكثر من يوم)
+  function dayKeyOf(x) { return x.getFullYear() + "-" + (x.getMonth() + 1) + "-" + x.getDate(); }
+  function activeDay(k) {
+    return arr("adhkarDone:" + k).length > 0 || g("tasbihDay:" + k) > 0 ||
+           localStorage.getItem("quranDay:" + k) === "1" || localStorage.getItem("storyDay:" + k) === "1";
+  }
+  let streakN = 0;
+  (function () {
+    const x = new Date();
+    if (!activeDay(dayKeyOf(x))) x.setDate(x.getDate() - 1);
+    while (activeDay(dayKeyOf(x)) && streakN < 3650) { streakN++; x.setDate(x.getDate() - 1); }
+  })();
+  if (streakN > g("bestStreak")) localStorage.setItem("bestStreak", streakN);
+  const streak = streakN;
+  const best = Math.max(g("bestStreak"), streak);
+
+  const adhkarSets = g("stat:adhkarSets");
+  const tasbihTotal = g("stat:tasbihTotal");
+  const surahs = arr("stat:surahs").length;
+  const prophets = arr("stat:prophets").length;
+
+  // النقاط والمستوى
+  const points = best * 5 + adhkarSets * 10 + Math.floor(tasbihTotal / 10) + surahs * 3 + prophets * 5 + g("stat:quizCorrect") * 2;
+  const levels = [[0, "مبتدئ 🌱"], [100, "ثابت 🌿"], [300, "مجتهد 🌳"], [700, "مداوم ⭐"], [1500, "متميز 🌟"], [3000, "نجم الموقع 👑"]];
+  let li = 0;
+  levels.forEach((l, i) => { if (points >= l[0]) li = i; });
+  document.getElementById("lvName").textContent = levels[li][1];
+  document.getElementById("pts").textContent = points + " نقطة";
+  if (li < levels.length - 1) {
+    const from = levels[li][0], to = levels[li + 1][0];
+    document.getElementById("fill").style.width = ((points - from) / (to - from) * 100) + "%";
+    document.getElementById("next").textContent = "باقي " + (to - points) + " نقطة للمستوى: " + levels[li + 1][1];
+  } else {
+    document.getElementById("fill").style.width = "100%";
+    document.getElementById("next").textContent = "وصلت لأعلى مستوى 👑";
+  }
+
+  // مهام اليوم
+  const tasks = [
+    ["🤲", "أتمم قسماً من الأذكار", arr("adhkarDone:" + dk).length > 0],
+    ["📿", "سبّح 33 تسبيحة", g("tasbihDay:" + dk) >= 33],
+    ["📖", "اقرأ من القرآن", localStorage.getItem("quranDay:" + dk) === "1"],
+    ["📜", "اقرأ قصة نبي", localStorage.getItem("storyDay:" + dk) === "1"]
+  ];
+  const tb = document.getElementById("tasks");
+  let okCount = 0;
+  tasks.forEach(x => {
+    if (x[2]) okCount++;
+    const div = document.createElement("div");
+    div.className = "task" + (x[2] ? " ok" : "");
+    div.innerHTML = '<span class="ic">' + (x[2] ? "✅" : x[0]) + '</span><span></span>';
+    div.lastChild.textContent = x[1];
+    tb.appendChild(div);
+  });
+  document.getElementById("taskCount").textContent = "(" + okCount + "/" + tasks.length + ")";
+
+  // آخر قراءة
+  const ls = localStorage.getItem("lastSurahName");
+  if (ls) {
+    const a = document.createElement("a");
+    a.className = "last";
+    a.href = "quran.html";
+    a.textContent = "📌 آخر قراءة: " + ls + " - آية " + (localStorage.getItem("lastAyah") || 1);
+    document.getElementById("lastBox").appendChild(a);
+  }
+
+  // الإحصائيات
+  const stats = [
+    ["🔥", streak, "أيام متتالية"],
+    ["🏅", best, "أفضل أيام متتالية"],
+    ["🤲", adhkarSets, "أقسام أذكار أتممتها"],
+    ["📿", tasbihTotal, "إجمالي التسبيح"],
+    ["📖", surahs + " / 114", "سور فتحتها"],
+    ["📜", prophets + " / 25", "قصص قرأتها"],
+    ["🧠", g("stat:quizCorrect"), "إجابات صحيحة في الاختبارات"]
+  ];
+  const sb = document.getElementById("stats");
+  stats.forEach(s => {
+    const div = document.createElement("div");
+    div.className = "stat";
+    div.innerHTML = '<div class="ic">' + s[0] + '</div><b></b><span>' + s[2] + '</span>';
+    div.querySelector("b").textContent = s[1];
+    sb.appendChild(div);
+  });
+
+  // الأوسمة
+  const badges = [
+    ["🔥", "أسبوع من الثبات", "7 أيام متتالية", best >= 7],
+    ["🏆", "شهر من الثبات", "30 يوماً متتالياً", best >= 30],
+    ["🤲", "بداية الأذكار", "أتممت قسم أذكار", adhkarSets >= 1],
+    ["🛡️", "حارس الأذكار", "أتممت 10 أقسام", adhkarSets >= 10],
+    ["📿", "المسبّح", "100 تسبيحة", tasbihTotal >= 100],
+    ["💎", "ألف تسبيحة", "1000 تسبيحة", tasbihTotal >= 1000],
+    ["📖", "قارئ", "فتحت 10 سور", surahs >= 10],
+    ["📚", "محب القرآن", "فتحت 50 سورة", surahs >= 50],
+    ["📜", "محب القصص", "قرأت 5 قصص", prophets >= 5],
+    ["🌟", "عالم بالقصص", "قرأت قصص الـ25 نبياً", prophets >= 25],
+    ["🧠", "متفوّق", "50 إجابة صحيحة", g("stat:quizCorrect") >= 50],
+    ["🎓", "طالب علم", "أتممت 10 اختبارات", g("stat:quizDone") >= 10]
+  ];
+  const bb = document.getElementById("badges");
+  let unlocked = 0;
+  badges.forEach(b => {
+    if (b[3]) unlocked++;
+    const div = document.createElement("div");
+    div.className = "badge" + (b[3] ? " on" : "");
+    div.innerHTML = '<div class="ic">' + b[0] + '</div><b></b><span></span>';
+    div.querySelector("b").textContent = b[1];
+    div.querySelector("span").textContent = b[2];
+    bb.appendChild(div);
+  });
+  document.getElementById("badgeCount").textContent = "(" + unlocked + "/" + badges.length + ")";
+
+  (function () {
+    var b = document.getElementById("resetBtn"), armed = false, tm = null;
+    var KEEP = ["theme", "loc", "readMode", "qcal", "qflip"];
+    b.onclick = function () {
+      if (!armed) {
+        armed = true;
+        b.textContent = "⚠️ اضغط مرة ثانية للتأكيد";
+        tm = setTimeout(function () { armed = false; b.textContent = "🗑️ تصفير كل تقدّمي"; }, 5000);
+        return;
+      }
+      clearTimeout(tm);
+      var del = [];
+      for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (KEEP.indexOf(k) < 0) del.push(k); }
+      del.forEach(function (k) { localStorage.removeItem(k); });
+      b.textContent = "✅ تم التصفير";
+      setTimeout(function () { location.reload(); }, 800);
+    };
+  })();
+  if ("serviceWorker" in navigator) { navigator.serviceWorker.register("sw.js"); }
+</script>
+<script src="nav.js"></script>
+</body>
+</html>

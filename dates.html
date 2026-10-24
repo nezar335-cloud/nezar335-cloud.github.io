@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>التواريخ - خليل المسلم</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:'Cairo',sans-serif; background:#050505; color:#f3e9c6; padding-bottom:90px; }
+  header { text-align:center; padding:25px 10px 5px; }
+  header h1 { margin:0; font-size:30px; font-weight:900;
+    background:linear-gradient(90deg,var(--g4),var(--g2),var(--g),var(--g2),var(--g4));
+    background-size:300% auto; -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:shine 4s linear infinite; }
+  @keyframes shine { to { background-position:300% center; } }
+
+  .card { background:linear-gradient(145deg,#111,var(--c2)); margin:14px 16px; padding:18px; border-radius:20px;
+    border:1px solid var(--g); text-align:center; animation:glow 3s ease-in-out infinite; }
+  @keyframes glow { 0%,100% { box-shadow:0 0 8px rgba(var(--gr),.25); } 50% { box-shadow:0 0 22px rgba(var(--gr),.55); } }
+  .card h3 { margin:0 0 10px; color:var(--g2); }
+  #wd { font-size:20px; color:var(--g3); }
+  #hj { font-size:30px; font-weight:900; color:var(--g2); margin:6px 0; }
+  #gr { font-size:17px; color:#fff6d6; }
+
+  .tip { padding:10px 12px; margin:8px 0; background:#0d0d0d; border:1px solid var(--b); border-radius:14px; text-align:right; line-height:1.9; }
+
+  .sec { margin:18px 16px 6px; color:var(--g2); }
+  .ev { display:flex; align-items:center; gap:12px; margin:10px 16px; padding:14px; border-radius:16px;
+    background:linear-gradient(145deg,#111,var(--c2)); border:1px solid var(--b); }
+  .ev.first { border-color:var(--g2); box-shadow:0 0 16px rgba(var(--gr),.45); }
+  .ev .ic { font-size:30px; }
+  .ev .mid { flex:1; }
+  .ev .nm { font-size:18px; font-weight:700; color:#fff6d6; }
+  .ev .dt { font-size:12px; color:var(--g3); line-height:1.7; }
+  .ev .cd { text-align:center; min-width:70px; }
+  .ev .cd b { display:block; font-size:30px; color:var(--g2); line-height:1; }
+  .ev .cd span { font-size:12px; color:var(--g3); }
+  .note { margin:16px; padding:12px; font-size:13px; color:var(--g3); line-height:1.9; border:1px dashed var(--b); border-radius:14px; }
+
+
+</style>
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+<meta name="theme-color" content="#050505">
+<link rel="apple-touch-icon" href="icon-180.png">
+</head>
+<body>
+  <header><h1>📅 التواريخ</h1></header>
+
+  <div class="card">
+    <div id="wd"></div>
+    <div id="hj"></div>
+    <div id="gr"></div>
+  </div>
+
+  <div class="card">
+    <h3>🌿 اليوم في الميزان</h3>
+    <div id="tips"></div>
+  </div>
+
+  <h3 class="sec">⏳ المناسبات القادمة</h3>
+  <div id="events"></div>
+
+  <div class="note">⚠️ التقويم الهجري هنا هو تقويم أم القرى المحسوب فلكياً. بداية الشهور الفعلية في بلدك تعتمد على رؤية الهلال، فقد يختلف الموعد يوماً واحداً.</div>
+
+  <script src="dates.js"></script>
+<script>
+  const now = new Date();
+  const h = hij(now);
+  const wdIdx = now.getDay();
+  const wdName = now.toLocaleDateString("ar-SA-u-ca-gregory-nu-latn", { weekday: "long" });
+
+  document.getElementById("wd").textContent = "يوم " + wdName;
+  document.getElementById("hj").textContent = h ? hijText(h) : "التقويم الهجري غير مدعوم في هذا المتصفح";
+  document.getElementById("gr").textContent =
+    now.toLocaleDateString("ar-SA-u-ca-gregory-nu-latn", { day: "numeric", month: "long", year: "numeric" }) + " م";
+
+  // اليوم في الميزان
+  const tips = [];
+  if (h) {
+    const eidDay = (h.m === 10 && h.d === 1) || (h.m === 12 && h.d >= 10 && h.d <= 13);
+    if (h.m === 9) {
+      tips.push("🌙 شهر رمضان المبارك، وصيامه فرض.");
+    } else if (eidDay) {
+      tips.push("🚫 يحرم صيام العيد وأيام التشريق.");
+    } else {
+      if (h.m === 12 && h.d === 9) tips.push("🕋 يوم عرفة: يُستحب صيامه لغير الحاج.");
+      if (h.m === 12 && h.d < 9) tips.push("✨ من أيام العشر من ذي الحجة: العمل الصالح فيها أحب إلى الله، ويُستحب صيامها.");
+      if (h.m === 1 && (h.d === 9 || h.d === 10)) tips.push("🤲 عاشوراء: يُستحب صيام التاسع والعاشر.");
+      if (h.d >= 13 && h.d <= 15) tips.push("🌕 من الأيام البيض: يُستحب صيامها.");
+      if (h.m === 10 && h.d >= 2) tips.push("🗓️ شهر شوال: يُستحب صيام ستة أيام منه بعد رمضان.");
+      if (wdIdx === 1 || wdIdx === 4) tips.push("📿 اليوم " + wdName + ": يُستحب صيام الاثنين والخميس.");
+    }
+  }
+  if (wdIdx === 5) tips.push("🕌 يوم الجمعة: أكثر من الصلاة على النبي ﷺ، ويُستحب قراءة سورة الكهف.");
+  if (tips.length === 0) tips.push("🌿 لا مناسبة صيام خاصة اليوم، وخير الأعمال أدومها وإن قلّ.");
+  const tb = document.getElementById("tips");
+  tips.forEach(t => {
+    const div = document.createElement("div");
+    div.className = "tip";
+    div.textContent = t;
+    tb.appendChild(div);
+  });
+
+  // المناسبات القادمة
+  const base = new Date();
+  base.setHours(12, 0, 0, 0);
+  const list = [];
+  EVENTS.forEach(e => {
+    const r = nextHijri(e.m, e.d);
+    if (r) list.push({ n: e.n, ic: e.ic, days: r.days, date: r.date });
+  });
+  const fd = (5 - wdIdx + 7) % 7;
+  list.push({ n: "الجمعة القادمة", ic: "🕌", days: fd, date: new Date(base.getTime() + fd * 86400000) });
+  list.sort((a, b) => a.days - b.days);
+
+  const eb = document.getElementById("events");
+  list.forEach((e, i) => {
+    const hh = hij(e.date);
+    const div = document.createElement("div");
+    div.className = "ev" + (i === 0 ? " first" : "");
+    div.innerHTML = '<div class="ic"></div><div class="mid"><div class="nm"></div><div class="dt"></div></div><div class="cd"><b></b><span></span></div>';
+    div.querySelector(".ic").textContent = e.ic;
+    div.querySelector(".nm").textContent = e.n;
+    div.querySelector(".dt").textContent = gregText(e.date) + (hh ? " · " + hijText(hh) : "");
+    div.querySelector(".cd b").textContent = e.days === 0 ? "اليوم" : e.days;
+    div.querySelector(".cd span").textContent = e.days === 0 ? "🎉" : daysText(e.days);
+    eb.appendChild(div);
+  });
+
+  if ("serviceWorker" in navigator) { navigator.serviceWorker.register("sw.js"); }
+</script>
+<script src="nav.js"></script>
+</body>
+</html>

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>الأحاديث - خليل المسلم</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:'Cairo',sans-serif; background:#050505; color:#f3e9c6; padding-bottom:90px; }
+  header { text-align:center; padding:25px 10px 5px; }
+  header h1 { margin:0; font-size:30px; font-weight:900;
+    background:linear-gradient(90deg,var(--g4),var(--g2),var(--g),var(--g2),var(--g4));
+    background-size:300% auto; -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:shine 4s linear infinite; }
+  @keyframes shine { to { background-position:300% center; } }
+
+  .item { display:flex; align-items:center; gap:12px; background:linear-gradient(145deg,#111,var(--c2));
+    margin:10px 16px; padding:16px; border-radius:16px; border:1px solid var(--b); cursor:pointer; }
+  .item:active { border-color:var(--g2); box-shadow:0 0 14px rgba(var(--gr),.5); }
+  .item .ic { font-size:32px; }
+  .item .nm { font-size:19px; font-weight:700; color:#fff6d6; }
+  .item .ds { font-size:13px; color:var(--g3); }
+  .continue { display:block; margin:12px 16px; padding:14px; text-align:center; font-weight:900;
+    background:linear-gradient(90deg,var(--g4),var(--g)); color:#000; border-radius:16px; cursor:pointer;
+    box-shadow:0 0 14px rgba(var(--gr),.4); }
+
+  #reader { display:none; padding:0 16px; }
+  .back { margin:10px 0; padding:10px 18px; background:#111; color:var(--g2); border:1px solid var(--g);
+    border-radius:12px; font-size:15px; font-family:'Cairo',sans-serif; }
+  #rtitle { text-align:center; color:var(--g2); font-size:24px; font-weight:900; margin:6px 0; }
+  input { width:100%; margin:8px 0; padding:12px 16px; font-size:16px; background:#111; color:#fff6d6;
+    border:1px solid var(--g); border-radius:14px; font-family:'Cairo',sans-serif; }
+  #cnt { text-align:center; color:var(--g3); font-size:13px; margin-bottom:6px; }
+
+  .hc { background:#0d0d0d; border:1px solid var(--b); border-radius:18px; padding:14px; margin:12px 0; }
+  .hh { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .hn { color:var(--g2); font-weight:700; font-size:14px; }
+  .hg { color:var(--g3); font-size:12px; }
+  .ht { white-space:pre-line; font-family:'Amiri',serif; font-size:21px; line-height:2.1; color:#fff6d6; text-align:justify; }
+  .ha { display:flex; gap:8px; margin-top:10px; }
+  .b { flex:1; padding:9px 4px; background:#111; color:var(--g2); border:1px solid var(--b); border-radius:10px;
+    font-size:13px; font-family:'Cairo',sans-serif; }
+  #more { display:none; width:100%; margin:12px 0; padding:14px; border:none; border-radius:14px;
+    font-size:16px; font-weight:900; background:linear-gradient(90deg,var(--g4),var(--g)); color:#000; font-family:'Cairo',sans-serif; }
+
+
+  #gsearch { width:calc(100% - 32px); margin:12px 16px 4px; }
+  #gbox { padding:0 16px; }
+  #gcnt { text-align:center; color:var(--g3); font-size:13px; margin:8px 0; }
+  #gmore { display:none; width:100%; margin:12px 0; padding:14px; border:none; border-radius:14px;
+    font-size:16px; font-weight:900; background:linear-gradient(90deg,var(--g4),var(--g)); color:#000; font-family:'Cairo',sans-serif; }
+
+  .rbar { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .fbar { display:flex; gap:8px; align-items:center; margin:16px 0; }
+  .fbar button { flex:1; padding:13px 4px; border-radius:14px; border:1px solid var(--g); background:#111;
+    color:var(--g2); font-size:16px; font-weight:700; font-family:'Cairo',sans-serif; }
+  .fbar .pg { min-width:96px; text-align:center; color:var(--g3); font-size:14px; }
+
+  mark { background:var(--g2); color:#000; font-weight:700; border-radius:5px; padding:0 3px; }
+
+  .hsrc { margin-top:10px; padding-top:8px; border-top:1px dashed var(--b); font-family:'Cairo',sans-serif; font-size:13px; line-height:1.9; color:var(--g3); text-align:right; }
+</style>
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+<meta name="theme-color" content="#050505">
+<link rel="apple-touch-icon" href="icon-180.png">
+</head>
+<body>
+  <header><h1>📚 الأحاديث</h1></header>
+
+  <div id="listPage">
+    <input id="gsearch" placeholder="🔍 ابحث في كل الأحاديث (المجموعات الأربع)...">
+    <div id="gbox" style="display:none">
+      <div id="gcnt"></div>
+      <div id="glist"></div>
+      <button id="gmore" onclick="gMore()">عرض المزيد ⬇</button>
+    </div>
+    <div id="contBox"></div>
+    <div id="colls"></div>
+    <div class="item" id="favBtn"><div class="ic">⭐</div><div><div class="nm" id="favTxt">محفوظاتي</div><div class="ds">الأحاديث التي حفظتها</div></div></div>
+  </div>
+
+  <div id="reader">
+    <div class="rbar"><button class="back" id="modeBtn" onclick="toggleH()"></button></div>
+    <div id="rtitle"></div>
+    <input id="search" placeholder="ابحث في النص أو برقم الحديث...">
+    <div id="cnt"></div>
+    <div id="hlist"></div>
+    <button id="more" onclick="renderMore()">عرض المزيد ⬇</button>
+  </div>
+
+  <script>
+  const COLLS = [
+    { k: "nawawi", n: "الأربعون النووية", d: "جوامع الكلم في الدين", ic: "📗" },
+    { k: "qudsi", n: "الأحاديث القدسية", d: "ما يرويه النبي ﷺ عن ربه", ic: "✨" },
+    { k: "bukhari", n: "صحيح البخاري", d: "أصح كتاب بعد كتاب الله", ic: "📘" },
+    { k: "muslim", n: "صحيح مسلم", d: "ثاني الصحيحين", ic: "📙" }
+  ];
+  const $ = id => document.getElementById(id);
+  let coll = null, all = [], filtered = [], shown = 0, favMode = false, ticking = false;
+
+  function norm(t) {
+    return t.replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g, "")
+            .replace(/[ٱأإآ]/g, "ا").replace(/ى/g, "ي").replace(/ة/g, "ه");
+  }
+  function arGrade(g) {
+    return g.replace(/sahih/ig, "صحيح").replace(/hasan/ig, "حسن").replace(/da['’]?if/ig, "ضعيف").replace(/mawdu['’]?/ig, "موضوع");
+  }
+  function favs() { try { return JSON.parse(localStorage.getItem("hadithFav") || "[]"); } catch (e) { return []; } }
+  function saveFavs(a) { localStorage.setItem("hadithFav", JSON.stringify(a)); }
+  function favKey(h) { return h.k + ":" + h.n; }
+
+  let HL = [], PFX = false;
+  function esc(t) { return t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function clean(t) { return (t || "").replace(/&lt;/gi, "<").replace(/&gt;/gi, ">").replace(/<\s*\/?\s*br[^>]*>/gi, "\n").replace(/<\s*\/?\s*[a-z][^>]*>/gi, ""); }
+  /*HL1*/
+  function hUnits(w) {
+    const u = [];
+    for (let i = 0; i < w.length; i++) {
+      const c = w[i];
+      if (/[\u064B-\u065F\u0670\u0640]/.test(c)) { if (u.length) u[u.length - 1].e = i + 1; continue; }
+      if (!/[\u0621-\u063A\u0641-\u064A\u0671]/.test(c)) continue;
+      u.push({ s: i, e: i + 1, n: norm(c) });
+    }
+    return u;
+  }
+  function hPartEnd(w, k) {
+    const u = hUnits(w);
+    const st = u.length ? u[0].s : 0;
+    let n = 0;
+    for (let i = 0; i < u.length; i++) { n += u[i].n.length; if (n >= k) return { st: st, en: u[i].e }; }
+    return { st: st, en: w.length };
+  }
+  function hlHtml(text) {
+    const t = clean(text);
+    if (!HL.length) return esc(t);
+    const parts = t.split(/(\s+)/);
+    const idx = [], vals = [];
+    parts.forEach((p, i) => { if (p.trim()) { const v = nw(p); if (v) { idx.push(i); vals.push(v); } } });
+    const mk = new Set(), pt = {};
+    const m = HL.length;
+    for (let i = 0; i + m <= vals.length; i++) {
+      let ok = true;
+      for (let j = 0; j < m; j++) { const a = vals[i + j], b = HL[j]; if (!(PFX && j === m - 1 ? a.startsWith(b) : a === b)) { ok = false; break; } }
+      if (ok) {
+        for (let j = 0; j < m; j++) mk.add(idx[i + j]);
+        if (PFX && vals[i + m - 1] !== HL[m - 1]) pt[idx[i + m - 1]] = HL[m - 1].length;
+      }
+    }
+    return parts.map((p, i) => {
+      if (!mk.has(i)) return esc(p);
+      if (pt[i]) { const r = hPartEnd(p, pt[i]); return esc(p.slice(0, r.st)) + "<mark>" + esc(p.slice(r.st, r.en)) + "</mark>" + esc(p.slice(r.en)); }
+      return "<mark>" + esc(p) + "</mark>";
+    }).join("");
+  }
+  /*HL2*/
+  function splitSrc(text) {
+  const t = text || "";
+  let n = "";
+  const map = [];
+  for (let i = 0; i < t.length; i++) {
+    const c = t.charCodeAt(i);
+    if ((c >= 0x064B && c <= 0x065F) || c === 0x0670 || c === 0x0640 || (c >= 0x06D6 && c <= 0x06ED)) continue;
+    n += t[i];
+    map.push(i);
+  }
+  const re = /(^|[\s\[\(\]\)"”«»،.؛:!؟])(رواه|رواها|رواهما|رواهم|رواة|[أا]خرجه|[أا]خرجها|متفق عليه)(?![\u0621-\u064A])/g;
+  let m;
+  while ((m = re.exec(n)) !== null) {
+    const p = m.index + m[1].length;
+    if (p > 15 && p >= n.length * 0.15 && n.length - p <= 900) {
+      const cut = map[p];
+      return { main: t.slice(0, cut).replace(/[\s\[\(]+$/, ""), src: t.slice(cut).replace(/[\s\]\)]+$/, "") };
+    }
+  }
+  return { main: t, src: "" };
+}
+  function nw(w) { return norm(w.replace(/[^\u0621-\u063A\u0641-\u064A\u064B-\u065F\u0670\u0671\u0640]/g, "")); }
+  function toksOf(v) { return v.trim().split(/\s+/).map(nw).filter(Boolean); }
+  function hwords(h) {
+    if (!h._w) h._w = clean(h.t).split(/\s+/).map(nw).filter(Boolean);
+    return h._w;
+  }
+  function findSeq(ws, toks, pfx) {
+    const m = toks.length;
+    for (let i = 0; i + m <= ws.length; i++) {
+      let ok = true;
+      for (let j = 0; j < m; j++) {
+        const a = ws[i + j], b = toks[j];
+        if (!(pfx && j === m - 1 ? a.startsWith(b) : a === b)) { ok = false; break; }
+      }
+      if (ok) return true;
+    }
+    return false;
+  }
+  function card(h) {
+    const div = document.createElement("div");
+    div.className = "hc";
+    div.dataset.n = h.n;
+    div.innerHTML = '<div class="hh"><span class="hn"></span><span class="hg"></span></div><div class="ht"></div><div class="hsrc"></div>' +
+      '<div class="ha"><button class="b fv"></button><button class="b cp">📋 نسخ</button><button class="b sh">📤 مشاركة</button></div>';
+    div.querySelector(".hn").textContent = "حديث رقم " + h.n + ((favMode || labelMode) ? " · " + h.l : "");
+    div.querySelector(".hg").textContent = "";
+    const sp = splitSrc(clean(h.t));
+    div.querySelector(".ht").innerHTML = hlHtml(sp.main);
+    const sr = div.querySelector(".hsrc");
+    let sh = sp.src ? "📎 " + hlHtml(sp.src) : "";
+    if (h.g) sh += (sh ? " · " : "") + "الدرجة: " + esc(arGrade(h.g));
+    if (sh) sr.innerHTML = sh; else sr.style.display = "none";
+    const fv = div.querySelector(".fv");
+    const paint = () => { fv.textContent = favs().some(x => favKey(x) === favKey(h)) ? "⭐ محفوظ" : "☆ حفظ"; };
+    paint();
+    fv.onclick = () => {
+      const a = favs();
+      const i = a.findIndex(x => favKey(x) === favKey(h));
+      if (i >= 0) a.splice(i, 1); else a.push({ k: h.k, l: h.l, n: h.n, t: h.t, g: h.g });
+      saveFavs(a);
+      paint();
+    };
+    const txt = () => clean(h.t) + "\n— " + h.l + " · حديث " + h.n;
+    div.querySelector(".cp").onclick = () => {
+      if (navigator.clipboard) navigator.clipboard.writeText(txt()).then(() => alert("تم النسخ ✅"), () => alert("تعذّر النسخ"));
+      else alert("المتصفح لا يدعم النسخ");
+    };
+    div.querySelector(".sh").onclick = () => {
+      if (navigator.share) navigator.share({ text: txt() }).catch(() => {});
+      else div.querySelector(".cp").onclick();
+    };
+    return div;
+  }
+
+  function renderMore() {
+    const box = $("hlist");
+    const end = Math.min(shown + 20, filtered.length);
+    for (let i = shown; i < end; i++) box.appendChild(card(filtered[i]));
+    shown = end;
+    $("more").style.display = shown < filtered.length ? "block" : "none";
+    $("cnt").textContent = "عرض " + shown + " من " + filtered.length;
+  }
+  function hFlip() { return localStorage.getItem("readMode") === "flip"; }
+  let fi = 0;
+  function paintH() {
+    const b = $("modeBtn");
+    if (b) b.textContent = hFlip() ? "📜 وضع التمرير" : "📖 وضع التقليب";
+  }
+  function renderFlipH() {
+    const box = $("hlist");
+    box.innerHTML = "";
+    $("more").style.display = "none";
+    if (!filtered.length) { $("cnt").textContent = "لا توجد نتائج"; return; }
+    if (fi < 0) fi = 0;
+    if (fi >= filtered.length) fi = filtered.length - 1;
+    box.appendChild(card(filtered[fi]));
+    const bar = document.createElement("div");
+    bar.className = "fbar";
+    bar.innerHTML = '<button id="hPrev">▶ السابق</button><div class="pg"></div><button id="hNext">التالي ◀</button>';
+    bar.querySelector(".pg").textContent = (fi + 1) + " / " + filtered.length;
+    bar.querySelector("#hPrev").onclick = () => hTurn(-1);
+    bar.querySelector("#hNext").onclick = () => hTurn(1);
+    bar.querySelector("#hPrev").style.opacity = fi === 0 ? ".35" : "1";
+    bar.querySelector("#hNext").style.opacity = fi === filtered.length - 1 ? ".35" : "1";
+    box.appendChild(bar);
+    $("cnt").textContent = "حديث " + (fi + 1) + " من " + filtered.length;
+    if (coll && !favMode) localStorage.setItem("hadithLast", JSON.stringify({ k: coll.k, n: filtered[fi].n }));
+    window.scrollTo(0, 0);
+  }
+  function hTurn(d) {
+    const k = fi + d;
+    if (k < 0 || k >= filtered.length) return;
+    fi = k;
+    renderFlipH();
+  }
+  function toggleH() {
+    const was = hFlip();
+    let cur = null;
+    try { cur = JSON.parse(localStorage.getItem("hadithLast") || "null"); } catch (e) {}
+    localStorage.setItem("readMode", was ? "scroll" : "flip");
+    paintH();
+    const n = (cur && coll && cur.k === coll.k) ? cur.n : null;
+    if (!was) {
+      fi = n !== null ? Math.max(0, filtered.findIndex(x => String(x.n) === String(n))) : 0;
+      renderFlipH();
+    } else {
+      showList();
+      if (n !== null) {
+        const idx = filtered.findIndex(x => String(x.n) === String(n));
+        while (shown <= idx && shown < filtered.length) renderMore();
+        const el = document.querySelector('.hc[data-n="' + n + '"]');
+        if (el) el.scrollIntoView({ block: "start" });
+      }
+    }
+  }
+  let hx = null, hy = null;
+  document.addEventListener("touchstart", e => { hx = e.touches[0].clientX; hy = e.touches[0].clientY; }, { passive: true });
+  document.addEventListener("touchend", e => {
+    if (hx === null) return;
+    const dx = e.changedTouches[0].clientX - hx, dy = e.changedTouches[0].clientY - hy;
+    hx = null;
+    if (!hFlip() || $("reader").style.display !== "block" || !filtered.length) return;
+    if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5) hTurn(dx > 0 ? 1 : -1);
+  }, { passive: true });
+  function showList() {
+    if (hFlip()) { fi = 0; renderFlipH(); return; }
+    $("hlist").innerHTML = ""; shown = 0; renderMore();
+  }
+
+  function openReader(title) {
+    HL = []; PFX = false;
+    paintH();
+    $("listPage").style.display = "none";
+    $("reader").style.display = "block";
+    $("rtitle").textContent = title;
+    $("search").value = "";
+  }
+
+  function openColl(c, startN) {
+    coll = c; favMode = false;
+    openReader(c.n);
+    $("hlist").textContent = "جاري التحميل...";
+    $("more").style.display = "none";
+    $("cnt").textContent = "";
+    fetch("hadith-" + c.k + ".json")
+      .then(r => { if (!r.ok) throw new Error("x"); return r.json(); })
+      .then(d => {
+        all = (d.hadiths || []).map(h => ({
+          n: h.hadithnumber || h.arabicnumber, t: (h.text || "").trim(),
+          g: (h.grades || []).map(x => x.grade).filter(Boolean).join("، "), k: c.k, l: c.n
+        })).filter(h => h.t);
+        filtered = all;
+        showList();
+        if (startN !== undefined && hFlip()) { fi = Math.max(0, filtered.findIndex(x => String(x.n) === String(startN))); renderFlipH(); } else if (startN !== undefined) {
+          const idx = all.findIndex(h => String(h.n) === String(startN));
+          while (shown <= idx && shown < filtered.length) renderMore();
+          const el = document.querySelector('.hc[data-n="' + startN + '"]');
+          if (el) el.scrollIntoView({ block: "start" });
+        } else window.scrollTo(0, 0);
+      })
+      .catch(() => { $("hlist").textContent = "ملف هذه المجموعة غير موجود (hadith-" + c.k + ".json). شغّل أمر التحميل ثم حدّث الصفحة."; });
+  }
+
+  function openFavs() {
+    favMode = true; coll = null;
+    openReader("⭐ محفوظاتي");
+    all = favs(); filtered = all;
+    if (!all.length) { $("hlist").textContent = "ما حفظت أي حديث بعد. اضغط ☆ حفظ تحت أي حديث."; $("cnt").textContent = ""; $("more").style.display = "none"; }
+    else showList();
+    window.scrollTo(0, 0);
+  }
+
+  let tm = null;
+  $("search").oninput = function () {
+    clearTimeout(tm);
+    const v = this.value;
+    tm = setTimeout(() => {
+      const raw = v.trim().replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+      const toks = toksOf(raw);
+      if (/^\d+$/.test(raw)) { HL = []; filtered = all.filter(h => String(h.n) === raw); }
+      else { HL = toks; PFX = false; filtered = !toks.length ? all : all.filter(h => findSeq(hwords(h), toks, false)); if (toks.length && !filtered.length) { PFX = true; filtered = all.filter(h => findSeq(hwords(h), toks, true)); } }
+      showList();
+    }, 300);
+  };
+
+  // حفظ آخر حديث وصلت له
+  window.addEventListener("scroll", () => {
+    if (!coll || favMode || $("reader").style.display !== "block" || ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      ticking = false;
+      const cs = document.querySelectorAll("#hlist .hc");
+      for (const el of cs) {
+        if (el.getBoundingClientRect().bottom > 90) {
+          localStorage.setItem("hadithLast", JSON.stringify({ k: coll.k, n: el.dataset.n }));
+          break;
+        }
+      }
+    });
+  });
+
+  function goBack() {
+    $("reader").style.display = "none";
+    $("listPage").style.display = "block";
+    renderHome();
+  }
+
+  function renderHome() {
+    const box = $("colls");
+    box.innerHTML = "";
+    COLLS.forEach(c => {
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = '<div class="ic"></div><div><div class="nm"></div><div class="ds"></div></div>';
+      div.querySelector(".ic").textContent = c.ic;
+      div.querySelector(".nm").textContent = c.n;
+      div.querySelector(".ds").textContent = c.d;
+      div.onclick = () => openColl(c);
+      box.appendChild(div);
+    });
+    $("favTxt").textContent = "محفوظاتي (" + favs().length + ")";
+    $("favBtn").onclick = openFavs;
+    const cb = $("contBox");
+    cb.innerHTML = "";
+    let last = null;
+    try { last = JSON.parse(localStorage.getItem("hadithLast") || "null"); } catch (e) {}
+    if (last) {
+      const c = COLLS.find(x => x.k === last.k);
+      if (c) {
+        const d = document.createElement("div");
+        d.className = "continue";
+        d.textContent = "📌 أكمل من حيث توقفت: " + c.n + " · حديث " + last.n;
+        d.onclick = () => openColl(c, last.n);
+        cb.appendChild(d);
+      }
+    }
+  }
+
+  // ===== البحث في كل المجموعات =====
+  let labelMode = false, G = null, gRes = [], gShown = 0, gtm = null, gLast = "";
+
+  function loadAll() {
+    if (G) return G;
+    G = Promise.all(COLLS.map(c =>
+      fetch("hadith-" + c.k + ".json")
+        .then(r => { if (!r.ok) throw new Error("x"); return r.json(); })
+        .then(d => (d.hadiths || []).map(h => ({
+          n: h.hadithnumber || h.arabicnumber, t: (h.text || "").trim(),
+          g: (h.grades || []).map(x => x.grade).filter(Boolean).join("، "), k: c.k, l: c.n
+        })).filter(h => h.t))
+        .catch(() => [])
+    )).then(a => [].concat.apply([], a));
+    return G;
+  }
+
+  function gMore() {
+    const box = $("glist");
+    const end = Math.min(gShown + 20, gRes.length);
+    labelMode = true;
+    for (let i = gShown; i < end; i++) box.appendChild(card(gRes[i]));
+    labelMode = false;
+    gShown = end;
+    $("gmore").style.display = gShown < gRes.length ? "block" : "none";
+    $("gcnt").textContent = "وُجد " + gRes.length + " حديث · معروض " + gShown;
+  }
+
+  $("gsearch").oninput = function () {
+    clearTimeout(gtm);
+    const v = this.value;
+    gtm = setTimeout(() => {
+      const raw = v.trim().replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+      const isNum = /^\d+$/.test(raw);
+      const toks = isNum ? [] : toksOf(raw);
+      const key = isNum ? raw : toks.join(" ");
+      gLast = key;
+      HL = toks;
+      ["colls", "favBtn", "contBox"].forEach(id => { $(id).style.display = key ? "none" : ""; });
+      $("gbox").style.display = key ? "block" : "none";
+      if (!key) return;
+      $("glist").innerHTML = "";
+      $("gmore").style.display = "none";
+      if (!isNum && key.length < 2) { $("gcnt").textContent = "اكتب حرفين على الأقل"; return; }
+      $("gcnt").textContent = "جاري البحث...";
+      loadAll().then(all => {
+        if (gLast !== key) return;
+        if (!all.length) { $("gcnt").textContent = "ملفات الأحاديث غير موجودة، شغّل أمر التحميل"; return; }
+        PFX = false;
+        gRes = all.filter(h => isNum ? String(h.n) === raw : findSeq(hwords(h), toks, false));
+        if (!isNum && toks.length && !gRes.length) { PFX = true; gRes = all.filter(h => findSeq(hwords(h), toks, true)); }
+        gShown = 0;
+        $("glist").innerHTML = "";
+        if (!gRes.length) { $("gcnt").textContent = "ما لقيت نتائج لـ «" + v.trim() + "»"; return; }
+        gMore();
+      });
+    }, 300);
+  };
+
+  renderHome();
+  if ("serviceWorker" in navigator) { navigator.serviceWorker.register("sw.js"); }
+</script>
+<script src="nav.js"></script>
+</body>
+</html>
