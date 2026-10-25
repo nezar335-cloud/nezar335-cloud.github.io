@@ -1,0 +1,80 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Prepare web files
+        run: |
+          mkdir -p app/www
+          cp -r *.html *.js *.css *.json *.png app/www/
+
+      - name: Create Capacitor project
+        working-directory: app
+        run: |
+          npm init -y
+          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
+          cat > capacitor.config.json << 'EOF'
+          {
+            "appId": "io.github.nezar335cloud.khalilmuslim",
+            "appName": "خليل المسلم",
+            "webDir": "www",
+            "backgroundColor": "#050505",
+            "server": { "androidScheme": "https" }
+          }
+          EOF
+          npx cap add android
+          npx cap sync android
+
+      - name: Permissions and icon
+        working-directory: app
+        run: |
+          M=android/app/src/main/AndroidManifest.xml
+          sed -i 's#<uses-permission android:name="android.permission.INTERNET" />#&\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n    <uses-permission android:name="android.permission.VIBRATE" />#' $M
+          python3 -m pip install pillow
+          python3 - << 'EOF'
+          from PIL import Image
+          import os, shutil
+          src = Image.open("www/icon-512.png").convert("RGBA")
+          base = "android/app/src/main/res"
+          for d, s in {"mdpi": 48, "hdpi": 72, "xhdpi": 96, "xxhdpi": 144, "xxxhdpi": 192}.items():
+              p = base + "/mipmap-" + d
+              os.makedirs(p, exist_ok=True)
+              im = src.resize((s, s), Image.LANCZOS)
+              for n in ("ic_launcher.png", "ic_launcher_round.png", "ic_launcher_foreground.png"):
+                  im.save(p + "/" + n)
+          shutil.rmtree(base + "/mipmap-anydpi-v26", ignore_errors=True)
+          EOF
+
+      - name: Build APK
+        working-directory: app/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Rename APK
+        run: cp app/android/app/build/outputs/apk/debug/app-debug.apk khalil-almuslim.apk
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-${{ github.run_number }}
+          name: خليل المسلم ${{ github.run_number }}
+          files: khalil-almuslim.apk
