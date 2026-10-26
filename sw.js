@@ -1,4 +1,4 @@
-const CACHE = "khill-1792752373";
+const CACHE = "khill-1793048847";
 const FILES = [
   "./",
   "about.html",
@@ -29,6 +29,7 @@ const FILES = [
   "quiz.html",
   "quran.html",
   "quran.json",
+  "ready.js",
   "style.css",
   "tasbih.html",
   "theme.js",
