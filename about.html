@@ -80,9 +80,10 @@
     </ul>
   </div>
 
-  <div class="ver">الإصدار 1.0</div>
+  <div class="ver">الإصدار 1.0 <span id="bld"></span></div>
 
 <script>
+  fetch("build.json", { cache: "no-store" }).then(function (r) { return r.json(); }).then(function (d) { document.getElementById("bld").textContent = "· بناء " + d.build; }).catch(function () {});
   if ("serviceWorker" in navigator && location.origin !== "https://localhost") { navigator.serviceWorker.register("sw.js"); }
 </script>
 <script src="nav.js"></script>

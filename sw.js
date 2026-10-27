@@ -1,4 +1,4 @@
-const CACHE = "khill-1793088354";
+const CACHE = "khill-1793134175";
 const FILES = [
   "./",
   "about.html",
@@ -8,6 +8,7 @@ const FILES = [
   "adhkar.json",
   "anbiya.html",
   "anbiya.js",
+  "build.json",
   "cities.js",
   "dates.html",
   "dates.js",
