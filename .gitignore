@@ -21,3 +21,4 @@ t-*.js
 check-report*
 check2.py
 t-*.js
+verify.sh
